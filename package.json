@@ -18,7 +18,8 @@
     "org.apache.cordova.device",
     "org.apache.cordova.console",
     "com.ionic.keyboard",
-    "org.apache.cordova.camera"
+    "org.apache.cordova.camera",
+    "com.phonegap.plugins.barcodescanner"
   ],
   "cordovaPlatforms": []
 }
