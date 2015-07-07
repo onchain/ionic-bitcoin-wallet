@@ -16,6 +16,7 @@
     "fastclick": "~1.0.6",
     "qrcode-decoder-js": "*",
     "foundation": "~5.5.2",
-    "foundation-icon-fonts": "*"
+    "foundation-icon-fonts": "*",
+    "animate.css": "~3.3.0"
   }
 }
