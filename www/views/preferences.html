@@ -1,0 +1,104 @@
+
+<div 
+  class="topbar-container" 
+  ng-include="'views/includes/topbar.html'"
+  ng-init="titleSection='Preferences'; closeToHome = true">
+</div>
+
+
+<div class="content preferences" ng-controller="preferencesController as preferences">
+
+  <ul class="no-bullet m0 size-14"  ng-show="!index.noFocusedWallet">
+    <h4 class="title m0">{{index.alias}} [{{index.walletName}}] <span translate>settings</span></h4>
+
+
+    <li class="line-b p20" ng-click="$root.go('preferencesAlias')">
+      <span translate>Wallet Alias</span>
+      <span class="right text-gray">
+        <i class="icon-arrow-right3 size-24 right"></i>
+        {{index.alias||index.walletName}}
+      </span>
+    </li>
+
+    <li class="line-b p20" ng-click="$root.go('preferencesEmail')">
+      <span translate>Email Notifications</span>
+      <span class="right text-gray">
+        <i class="icon-arrow-right3 size-24 right"></i>
+         <span ng-if="!index.preferences.email" translate>Disabled</span>
+         <span ng-if="index.preferences.email">{{index.preferences.email}}</span>
+      </span>
+    </li>
+
+    <li class="line-b p20" ng-click="$root.go('preferencesColor')">
+      <span translate>Color</span>
+      <span class="right text-gray">
+        <i class="icon-arrow-right3 size-24 right"></i>
+        <span ng-style="{'color':index.backgroundColor}">&block;</span>
+      </span>      
+    </li>
+    <li class="line-b p20">
+      <span translate>Encrypt Private Key</span>
+      <switch id="network-name" name="encrypt" ng-model="encrypt" class="green right"></switch>
+  </li>
+ 
+    <h4 class="title m0">&nbsp;</h4>
+    <li class="line-b p20" ng-click="$root.go('backup')">
+      <i class="icon-arrow-right3 size-24 right text-gray"></i>  
+      <span translate>Backup</span>
+    </li>
+    <li class="line-b p20" ng-click="$root.go('preferencesAdvanced')">
+      <i class="icon-arrow-right3 size-24 right text-gray"></i>  
+      <span translate>Advanced</span>
+    </li>
+  </ul>
+  <ul class="no-bullet m0 size-14">
+
+    <h4 class="title m0" translate>Global settings</h4>
+
+    <li class="line-b p20" ng-click="$root.go('preferencesLanguage')">
+      <span translate>Language</span>
+      <span class="right text-gray">
+        <i class="icon-arrow-right3 size-24 right"></i>
+        {{index.defaultLanguageName|translate}}
+      </span>
+    </li>
+
+    <li class="line-b p20" ng-click="$root.go('preferencesUnit')">
+      <span translate>Unit</span>
+      <span class="right text-gray">
+        <i class="icon-arrow-right3 size-24 right"></i>
+        {{preferences.unitName}}
+      </span>
+    </li>
+    <li class="line-b p20" ng-click="$root.go('preferencesAltCurrency')">
+      <span translate>Alternative Currency</span>
+      <span class="right text-gray">
+        <i class="icon-arrow-right3 size-24 right"></i>
+        {{preferences.selectedAlternative.name}}
+      </span>
+    </li>
+    <li class="line-b p20" ng-click="$root.go('preferencesFee')">
+      <span translate>Bitcoin Network Fee Policy</span>
+      <span class="right text-gray">
+        <i class="icon-arrow-right3 size-24 right"></i>
+        {{preferences.feeName|translate}}
+      </span>
+    </li>
+ 
+    
+    <li class="line-b p20" ng-click="$root.go('preferencesBwsUrl')">
+      <span>Bitcore Wallet Service</span>
+      <span class="text-gray db">
+          <i class="icon-arrow-right3 size-24 right"></i>
+          {{preferences.bwsurl}}
+        </span>
+    </li>
+    <li class="line-b p20" ng-click="$root.go('about')">
+      <i class="icon-arrow-right3 size-24 right text-gray"></i>  
+      <span translate>About Copay</span>
+    </li>
+ 
+  </ul>
+
+</div>
+<div class="extra-margin-bottom"></div>

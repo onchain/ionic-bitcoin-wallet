@@ -1,0 +1,26 @@
+<div 
+  class="topbar-container" 
+  ng-include="'views/includes/topbar.html'"
+  ng-init="titleSection='Session log'; goBackToState = 'about'">
+</div>
+
+
+
+<div class="content p20v" ng-controller="preferencesLogs as logs">
+
+  <div class="row columns">
+  <button class="black radius small expand" ng-show="logs.isCordova" ng-style="{'background-color':index.backgroundColor}" ng-click="logs.sendLogs()" ><i class="fi-mail"></i>
+      
+  <span translate>Send by email</span>
+  </button>
+
+  <ul class="no-bullet size-14 oh" style="word-wrap: break-word;">
+    <li class="line-b enable_text_select" ng-repeat="l in logs.logs">
+
+      <span ng-class="{'text-warning': l.level=='warn', 'text-secondary': l.level=='debug', 'text-primary': l.level=='info', 'text-alert': l.level=='error' }"> 
+      {{l.msg}}
+      </span>
+    </li>
+  </ul>
+  </div>
+</div>

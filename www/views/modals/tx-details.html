@@ -1,0 +1,93 @@
+<nav class="tab-bar">
+  <section class="left-small">
+    <a ng-click="cancel()">
+      <i class="icon-arrow-left3 icon-back"></i>
+      <span class="text-back" translate>Back</span>
+    </a>
+  </section>
+  <section class="middle tab-bar-section">
+    <h1 class="title ellipsis" ng-style="{'color':color}" translate>
+      Transaction
+    </h1>
+  </section>
+</nav>
+
+<div class="modal-content fix-modals-touch">
+  <div class="header-modal text-center">
+    <div class="size-42">
+      <span ng-if="btx.action == 'received'">+</span><span ng-if="btx.action == 'sent'">-</span>{{btx.amountStr}} {{settings.unitName}}
+    </div>
+    <div class="size-18 m5t text-gray" ng-show="btx.alternativeAmount">
+      {{btx.alternativeAmount}} {{settings.alternativeIsoCode}}
+    </div>
+  </div>
+
+  <h4 class="title m0" translate>Details</h4>
+  <ul class="no-bullet size-14 m0">
+    <li ng-if="btx.addressTo && btx.addressTo != 'N/A'" class="line-b p10 oh" ng-click="copyAddress(btx.addressTo)">
+    <span class="text-gray" translate>To</span>:
+    <span class="right">
+      <span ng-if="btx.merchant">
+        <span ng-show="btx.merchant.pr.ca"><i class="fi-lock color-greeni"></i> {{btx.merchant.domain}}</span>
+        <span ng-show="!btx.merchant.pr.ca"><i class="fi-unlock color-yellowi"></i> {{btx.merchant.domain}}</span>
+      </span>
+      <span ng-if="!btx.merchant">
+        <span class="text-gray enable_text_select"> {{btx.labelTo || btx.addressTo}}</span>
+      </span>
+    </span>
+    </li>
+    <li ng-if="btx.time" class="line-b p10 oh">
+    <span class="text-gray" translate>Date</span>:
+    <span class="right">
+      <time>{{ btx.time * 1000 | amCalendar}}</time>
+    </span>
+    </li>
+    <li ng-if="btx.message" class="line-b p10 oh">
+    <span class="text-gray" translate>Note</span>:
+    <span class="right">
+      {{btx.message}}
+    </span>
+    </li>
+    <li ng-if="btx.merchant" class="line-b p10 oh">
+    <span class="text-gray" translate>Merchant message</span>:
+    <span class="right">
+      {{btx.merchant.pr.pd.memo}}
+    </span>
+    </li>
+    <li ng-if="btx.time" class="line-b p10 oh">
+    <span class="text-gray" translate>Confirmations</span>:
+    <span class="right" >
+      <span class="text-warning" ng-show="!btx.confirmations || btx.confirmations == 0" translate>
+        Unconfirmed
+      </span>
+      <span class="label gray radius" ng-show="btx.confirmations>0">
+        {{btx.confirmations}}
+      </span>
+    </span>
+    </li>
+  </ul>
+
+  <div ng-if="btx.actions[0] && isShared">
+    <h4 class="title m0" translate>Participants</h4>
+    <ul class="no-bullet size-14 m0">
+      <li class="line-b p10 text-gray" ng-repeat="c in btx.actions">
+      <span class="right">
+        <i ng-if="c.type == 'reject'" class="fi-x icon-sign x db"></i>
+        <i ng-if="c.type == 'accept'" class="fi-check icon-sign check db"></i>
+      </span>
+      {{c.copayerName}} <span ng-if="c.copayerId == copayerId">({{'Me'|translate}})</span>
+      </li>
+    </ul>
+  </div>
+
+  <div ng-show="btx.txid" class="tx-details-blockchain">
+    <div class="text-center m20t">
+      <button class="button outline round dark-gray tiny" ng-click="$root.openExternalLink('https://' +
+        (getShortNetworkName() == 'test' ? 'test-' : '') + 'insight.bitpay.com/tx/' + btx.txid)">
+        <span class="text-gray" translate>See it on the blockchain</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="extra-margin-bottom"></div>
+</div>
