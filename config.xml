@@ -18,4 +18,5 @@
         <param name="ios-package" onload="true" value="CDVStatusBar" />
     </feature>
     <plugin name="com.phonegap.plugins.barcodescanner" spec="https://github.com/wildabeast/BarcodeScanner.git" />
+    <plugin name="org.apache.cordova.camera" spec="^0.3.6" />
 </widget>
