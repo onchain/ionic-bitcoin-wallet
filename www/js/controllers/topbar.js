@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('topbarController', function($rootScope, $scope, $timeout, $modal, isCordova, isMobile, go) {   
+angular.module('copayApp.controllers').controller('topbarController', function($rootScope, $scope, $timeout, $modal, isCordova, isMobile, isDevice, go) {
   var cordovaOpenScanner = function() {
     window.ignoreMobilePause = true;
     window.plugins.spinnerDialog.show(null, 'Preparing camera...', true);
@@ -15,7 +15,7 @@ angular.module('copayApp.controllers').controller('topbarController', function($
 
           $timeout(function() {
             var data = result.text;
-            $rootScope.$emit('dataScanned', data); 
+            $rootScope.$emit('dataScanned', data);
           }, 1000);
         },
         function onError(error) {
@@ -26,11 +26,11 @@ angular.module('copayApp.controllers').controller('topbarController', function($
           alert('Scanning error');
         }
       );
-      go.send(); 
+      go.send();
     }, 100);
-  }; 
+  };
 
-  var modalOpenScanner = function() { 
+  var modalOpenScanner = function() {
     var _scope = $scope;
     var ModalInstanceCtrl = function($scope, $rootScope, $modalInstance) {
       // QR code Scanner
@@ -56,7 +56,7 @@ angular.module('copayApp.controllers').controller('topbarController', function($
         if (localMediaStream && localMediaStream.stop) localMediaStream.stop();
         localMediaStream = null;
         video.src = '';
-      }; 
+      };
 
       qrcode.callback = function(data) {
         _scanStop();
@@ -89,7 +89,7 @@ angular.module('copayApp.controllers').controller('topbarController', function($
           canvas = document.getElementById('qr-canvas');
           context = canvas.getContext('2d');
 
-          
+
           video = document.getElementById('qrcode-scanner-video');
           $video = angular.element(video);
           canvas.width = 300;
@@ -116,13 +116,13 @@ angular.module('copayApp.controllers').controller('topbarController', function($
       keyboard: false
     });
     modalInstance.result.then(function(data) {
-      $rootScope.$emit('dataScanned', data); 
+      $rootScope.$emit('dataScanned', data);
     });
 
   };
 
   this.openScanner = function() {
-    if (isCordova) {
+    if (isDevice) {
       cordovaOpenScanner();
     }
     else {
