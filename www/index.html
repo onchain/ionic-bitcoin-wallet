@@ -68,6 +68,7 @@
     <script src="js/services/addressService.js"></script>
     <script src="js/services/fileStorage.js"></script>
     <script src="js/services/bitcore.js"></script>
+    <script src="js/services/addressParser.js"></script>
     <script src="js/directives"></script>
     <script src="js/directives/ngSwipe.js"></script>
     <script src="js/directives/directives.js"></script>
@@ -110,7 +111,7 @@
         <div class="inner-wrap">
           <div ng-include="&apos;views/includes/sidebar.html&apos;" ng-if="index.hasProfile"></div>
 
-          <div notifications="right top"></div> 
+          <div notifications="right top"></div>
           <div ng-include="&apos;views/includes/password.html&apos;" ng-if="index.askPassword"></div>
           <div id="sectionContainer">
             <div id="mainSection">
