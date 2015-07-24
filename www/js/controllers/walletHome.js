@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('walletHomeController', function($scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus, isCordova, profileService, lodash, configService, rateService, storageService, bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService) {
+angular.module('copayApp.controllers').controller('walletHomeController', function($scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus, isCordova, profileService, lodash, configService, rateService, storageService, bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService, addressParser, go) {
 
   var self = this;
   $rootScope.hideMenuBar = false;
@@ -26,9 +26,35 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   this.addr = {};
 
   var disableScannerListener = $rootScope.$on('dataScanned', function(event, data) {
-    self.setForm(data);
-    $rootScope.$emit('Local/SetTab', 'send');
+    if (addressParser.isBitID(data) === true) {
+      addressParser.setAddress(data);
+      bitidConfirmationModal(addressParser.getParsed());
+    } else {
+      go.send();
+      self.setForm(data);
+      $rootScope.$emit('Local/SetTab', 'send');
+    }
   });
+
+  var bitidConfirmationModal = function(address) {
+    var ModalInstanceCtrl = function($scope, $modalInstance) {
+      $scope.site_address = addressParser.getSiteAddress();
+      $scope.title = "Request for Identification";
+      $scope.cancel = function() {
+        $modalInstance.dismiss('cancel');
+      };
+    };
+    var modalInstance = $modal.open({
+      templateUrl: 'views/modals/bitid-confirmation.html',
+      windowClass: 'full animated slideInUp',
+      controller: ModalInstanceCtrl,
+    });
+
+    modalInstance.result.finally(function() {
+      var m = angular.element(document.getElementsByClassName('reveal-modal'));
+      m.addClass('slideOutDown');
+    });
+  };
 
   var disablePaymentUriListener = $rootScope.$on('paymentUri', function(event, uri) {
     $timeout(function() {
@@ -939,7 +965,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   };
 
 
-  // History 
+  // History
 
   function strip(number) {
     return (parseFloat(number.toPrecision(12)));
@@ -1051,7 +1077,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
     });
 
     this.confirmDialog(msg, function(confirmed){
-      if (confirmed) 
+      if (confirmed)
         self._doSendAll(amount);
     });
   }
