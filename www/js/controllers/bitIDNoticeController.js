@@ -7,4 +7,8 @@ angular.module('copayApp.controllers').controller('bitidNoticeController',
     }
     $scope.title = "Request for Identification";
     $scope.site_address = addressParser.getSiteAddress();
+
+    $scope.cancel = function() {
+      go.walletHome();
+    };
   });
