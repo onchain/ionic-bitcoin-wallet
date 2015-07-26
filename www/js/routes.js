@@ -464,6 +464,8 @@ angular
       cordova: -1,
       payment: -1,
 
+      bitIDNotice: 11,
+
       preferences: 11,
       preferencesColor: 12,
       backup: 12,
