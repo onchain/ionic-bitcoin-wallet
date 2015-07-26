@@ -1,0 +1,37 @@
+<div
+  class="topbar-container"
+  ng-include="'views/includes/topbar.html'"
+  ng-init="titleSection='BitID'; closeToHome = true">
+</div>
+
+
+<div class="content preferences" ng-controller="bitidNoticeController as confirmation">
+
+  <div class="m20tp text-center">
+    <div class="row">
+      <h1 class="text-center m20b">{{title|translate}}</h1>
+    </div>
+    <div class="row">
+      <div class="large-12 medium-12 small-12 columns">
+        <div class="text-center">
+          <h2>{{site_address}}</h2>
+          <p>is requesting that you identify yourself with a Bitcoin address.</p>
+          <p>Do you want to proceed?</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="large-6 medium-6 small-6 columns">
+        <button class="button warning expand round" ng-disabled="loading" ng-click="ok()">
+          <i class="fi-lock"></i> <span translate>Yes</span>
+        </button>
+      </div>
+      <div class="large-6 medium-6 small-6 columns">
+        <button class="button light-gray expand outline round" ng-disabled="loading"
+          ng-click="cancel()">
+          <i class="fi-x"></i> <span class="tu" translate>No</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

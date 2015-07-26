@@ -256,7 +256,7 @@ angular
           },
         }
       })
- 
+
       .state('preferencesAdvanced', {
         url: '/preferencesAdvanced',
         templateUrl: 'views/preferencesAdvanced.html',
@@ -393,6 +393,17 @@ angular
           },
         }
       })
+      .state('bitIDNotice', {
+        url: '/bitid/notice',
+        templateUrl: 'views/bitid-notice.html',
+        walletShouldBeComplete: true,
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/bitid-notice.html',
+          },
+        }
+      })
       .state('cordova', {
         url: '/cordova/:status',
         views: {
@@ -511,7 +522,7 @@ angular
         event.preventDefault();
       }
 
-      /* 
+      /*
        * --------------------
        */
 
@@ -551,7 +562,7 @@ angular
 
         var fromName = fromState.name;
         var toName = toState.name;
-        if (!fromName || !toName) 
+        if (!fromName || !toName)
           return true;
 
         var fromWeight = pageWeight[fromName];
@@ -597,7 +608,7 @@ angular
           var sc;
           // Keep prefDiv scroll
           var contentDiv  = e.getElementsByClassName('content');
-          if (contentDiv && contentDiv[0]) 
+          if (contentDiv && contentDiv[0])
             sc = contentDiv[0].scrollTop;
 
           cachedBackPanel = e.cloneNode(true);
@@ -609,7 +620,7 @@ angular
             cachedBackPanel.getElementsByClassName('content')[0].scrollTop  = sc;
 
           cachedTransitionState = desiredTransitionState;
-          //console.log('CACHing animation', cachedTransitionState); 
+          //console.log('CACHing animation', cachedTransitionState);
           return false;
         }
       }

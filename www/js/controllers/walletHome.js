@@ -17,7 +17,6 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   this.unitDecimals = config.unitDecimals;
   this.isCordova = isCordova;
   this.addresses = [];
-  this.isMobile = isMobile.any();
   this.isWindowsPhoneApp = isMobile.Windows() && isCordova;
   this.blockUx = false;
   this.isRateAvailable = false;
@@ -28,33 +27,13 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   var disableScannerListener = $rootScope.$on('dataScanned', function(event, data) {
     if (addressParser.isBitID(data) === true) {
       addressParser.setAddress(data);
-      bitidConfirmationModal(addressParser.getParsed());
+      go.bitID();
     } else {
       go.send();
       self.setForm(data);
       $rootScope.$emit('Local/SetTab', 'send');
     }
   });
-
-  var bitidConfirmationModal = function(address) {
-    var ModalInstanceCtrl = function($scope, $modalInstance) {
-      $scope.site_address = addressParser.getSiteAddress();
-      $scope.title = "Request for Identification";
-      $scope.cancel = function() {
-        $modalInstance.dismiss('cancel');
-      };
-    };
-    var modalInstance = $modal.open({
-      templateUrl: 'views/modals/bitid-confirmation.html',
-      windowClass: 'full animated slideInUp',
-      controller: ModalInstanceCtrl,
-    });
-
-    modalInstance.result.finally(function() {
-      var m = angular.element(document.getElementsByClassName('reveal-modal'));
-      m.addClass('slideOutDown');
-    });
-  };
 
   var disablePaymentUriListener = $rootScope.$on('paymentUri', function(event, uri) {
     $timeout(function() {
