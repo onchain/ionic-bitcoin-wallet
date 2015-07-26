@@ -1,12 +1,13 @@
 'use strict';
 
 angular.module('copayApp.services')
-  .service('addressParser', function() {
+  .factory('addressParser', function() {
 
     var _parsed = {};
     var _address = '';
+    var service = {};
 
-    this.setAddress = function(href) {
+    service.setAddress = function(href) {
       _address = href;
       _parseURI();
     };
@@ -32,20 +33,26 @@ angular.module('copayApp.services')
       };
     };
 
-    this.getParsed = function() {
+    service.getParsed = function() {
       if(_parsed == '') {
         _parseURI();
       }
       return _parsed;
     };
 
-    this.getSiteAddress = function() {
+    service.getSiteAddress = function() {
       var protocol = (_parsed.unsecure != '') ? 'http://' : 'https://';
       return protocol + _parsed.host;
     };
 
-    this.isBitID = function(address) {
+    service.isBitID = function(address) {
       return /^(bitid:).*$/.test(address);
     };
+
+    service.isReady = function() {
+      return _address != '' && _parsed != null;
+    };
+
+    return service;
 
   });
