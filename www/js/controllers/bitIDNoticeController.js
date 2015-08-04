@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('bitidNoticeController',
-  function($scope, $rootScope, addressParser, go) {
+  function($scope, $rootScope, addressParser, go, bitIDService) {
     if(!addressParser.isReady()) {
       go.walletHome();
     }
@@ -11,4 +11,8 @@ angular.module('copayApp.controllers').controller('bitidNoticeController',
     $scope.cancel = function() {
       go.walletHome();
     };
+
+    $scope.ok = function() {
+      bitIDService.generateSignature();
+    }
   });
