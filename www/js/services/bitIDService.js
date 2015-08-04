@@ -47,21 +47,29 @@ angular.module('copayApp.services')
 
     service.postMessage = function(message) {
       console.log(message);
-      // var callbackURL = addressParser.getCallBackURL();
-      // $http.post(callbackURL, message).success(function(data, status, headers, config) {
-      //   console.log("SUCCESS");
-      //   console.log(data);
-      //   console.log(status);
-      //   console.log(headers);
-      //   console.log(config);
-      // }).
-      // error(function(data, status, headers, config) {
-      //   console.log("ERROR");
-      //   console.log(data);
-      //   console.log(status);
-      //   console.log(headers);
-      //   console.log(config);
-      // });
+      var callbackURL = addressParser.getCallBackURL();
+      var req = {
+          method: 'POST',
+          url: callbackURL,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: message
+      };
+
+      $http(req).then(function(data, status, headers, config) {
+        console.log("SUCCESS");
+        console.log(data);
+        console.log(status);
+        console.log(headers);
+        console.log(config);
+      }, function(data, status, headers, config) {
+        console.log("ERROR");
+        console.log(data);
+        console.log(status);
+        console.log(headers);
+        console.log(config);
+      });
     };
 
     return service;
