@@ -13,37 +13,8 @@ angular.module('copayApp.services')
       _parseURI();
     };
 
-    function stringToBytes(str) {
-      for (var bytes = [], i = 0; i < str.length; i++)
-              bytes.push(str.charCodeAt(i));
-      return bytes;
-    };
-
-    function msg_numToVarInt(i) {
-      if (i < 0xfd) {
-        return [i];
-      } else if (i <= 0xffff) {
-        // can't use numToVarInt from bitcoinjs, BitcoinQT wants big endian here (!)
-        return [0xfd, i & 255, i >>> 8];
-      } else if (i <= 0xffffffff) {
-        return [0xfe, i & 255, (i >>> 8) & 255, (i >>> 16) & 255, i >>> 24];
-      } else {
-          throw ("message too large");
-      }
-    };
-
-    function msg_digest(message) {
-        var b = msg_bytes("Bitcoin Signed Message:\n").concat(msg_bytes(message));
-        return b;
-    };
-
-    function msg_bytes(message) {
-        var b = stringToBytes(message);
-        return msg_numToVarInt(b.length).concat(b);
-    };
-
     service.getMessageToSign = function() {
-      return msg_digest(service.getFullCallbackURI());
+      return service.getFullCallbackURI();
     };
 
     var _parseURI = function() {
@@ -74,8 +45,8 @@ angular.module('copayApp.services')
       return _parsed;
     };
 
-    service.getBitIDURI = function() {
-      return _parsed.protocol + _parsed.host;
+    service.getBitIDSiteURI = function() {
+      return _parsed.protocol + ":" + _parsed.host + _parsed.pathname;
     };
 
     service.getSiteAddress = function() {
