@@ -13,6 +13,7 @@ angular.module('copayApp.controllers').controller('bitidNoticeController',
     };
 
     $scope.ok = function() {
-      bitIDService.generateSignature();
+      var postData = bitIDService.generateSignatureMessage();
+      bitIDService.postMessage(postData);
     }
   });
