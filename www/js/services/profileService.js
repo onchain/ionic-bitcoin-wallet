@@ -26,7 +26,7 @@ angular.module('copayApp.services')
       // Set local object
       if (walletId)
         root.focusedClient = root.walletClients[walletId];
-      else 
+      else
         root.focusedClient = [];
 
       if (lodash.isEmpty(root.focusedClient)) {
