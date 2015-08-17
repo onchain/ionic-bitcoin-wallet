@@ -63,7 +63,7 @@ angular.module('copayApp.services').factory('go', function($window, $rootScope, 
     }
   };
 
-  root.bitID = function(uri) {
+  root.bitID = function() {
     $state.go('bitIDNotice');
   }
 
