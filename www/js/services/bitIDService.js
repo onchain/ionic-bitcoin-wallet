@@ -32,7 +32,7 @@ angular.module('copayApp.services')
       var signed = signedMessage.toString('base64');
       var pubKeyAddress = keyPair.pub.getAddress().toBase58Check();
       var fullMessage = service.createMessage(signed, pubKeyAddress);
-      return signed;
+      return fullMessage;
     };
 
     service.createMessage = function(signature, pubKey) {
