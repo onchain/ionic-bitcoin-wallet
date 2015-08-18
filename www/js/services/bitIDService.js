@@ -46,7 +46,6 @@ angular.module('copayApp.services')
     };
 
     service.postMessage = function(message) {
-      console.log(message);
       var callbackURL = addressParser.getCallBackURL();
       var req = {
           method: 'POST',
@@ -57,19 +56,7 @@ angular.module('copayApp.services')
           data: message
       };
 
-      $http(req).then(function(data, status, headers, config) {
-        console.log("SUCCESS");
-        console.log(data);
-        console.log(status);
-        console.log(headers);
-        console.log(config);
-      }, function(data, status, headers, config) {
-        console.log("ERROR");
-        console.log(data);
-        console.log(status);
-        console.log(headers);
-        console.log(config);
-      });
+      return $http(req);
     };
 
     return service;
