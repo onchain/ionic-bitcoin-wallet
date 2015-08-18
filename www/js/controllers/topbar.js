@@ -23,7 +23,6 @@ angular.module('copayApp.controllers').controller('topbarController', function($
           alert('Scanning error');
         }
       );
-      go.send();
     }, 100);
   };
 
@@ -82,7 +81,6 @@ angular.module('copayApp.controllers').controller('topbarController', function($
       $scope.init = function() {
         setScanner();
         $timeout(function() {
-          go.send();
           canvas = document.getElementById('qr-canvas');
           context = canvas.getContext('2d');
 

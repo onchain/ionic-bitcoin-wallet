@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('walletHomeController', function($scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus, isCordova, profileService, lodash, configService, rateService, storageService, bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService) {
+angular.module('copayApp.controllers').controller('walletHomeController', function($scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus, isCordova, profileService, lodash, configService, rateService, storageService, bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService, addressParser, go) {
 
   var self = this;
   $rootScope.hideMenuBar = false;
@@ -17,7 +17,6 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   this.unitDecimals = config.unitDecimals;
   this.isCordova = isCordova;
   this.addresses = [];
-  this.isMobile = isMobile.any();
   this.isWindowsPhoneApp = isMobile.Windows() && isCordova;
   this.blockUx = false;
   this.isRateAvailable = false;
@@ -26,8 +25,16 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   this.addr = {};
 
   var disableScannerListener = $rootScope.$on('dataScanned', function(event, data) {
-    self.setForm(data);
-    $rootScope.$emit('Local/SetTab', 'send');
+
+    if (addressParser.isBitID(data) === true) {
+      self.setOngoingProcess('Preparing BitID Authentication');
+      addressParser.setAddress(data);
+      go.bitID();
+    } else {
+      go.send();
+      self.setForm(data);
+      $rootScope.$emit('Local/SetTab', 'send');
+    }
   });
 
   var disablePaymentUriListener = $rootScope.$on('paymentUri', function(event, uri) {
@@ -939,7 +946,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   };
 
 
-  // History 
+  // History
 
   function strip(number) {
     return (parseFloat(number.toPrecision(12)));
@@ -1051,7 +1058,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
     });
 
     this.confirmDialog(msg, function(confirmed){
-      if (confirmed) 
+      if (confirmed)
         self._doSendAll(amount);
     });
   }

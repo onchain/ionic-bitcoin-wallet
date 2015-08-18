@@ -34,6 +34,7 @@
     <script src="lib/angular-gettext/dist/angular-gettext.js"></script>
     <script src="lib/angular-bitcore-wallet-client/angular-bitcore-wallet-client.js"></script>
     <script src="lib/angular-ui-switch/angular-ui-switch.js"></script>
+    <script src="lib/bitcoinjs.min.js"></script>
 
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
@@ -68,7 +69,8 @@
     <script src="js/services/addressService.js"></script>
     <script src="js/services/fileStorage.js"></script>
     <script src="js/services/bitcore.js"></script>
-    <script src="js/directives"></script>
+    <script src="js/services/addressParser.js"></script>
+    <script src="js/services/bitIDService.js"></script>
     <script src="js/directives/ngSwipe.js"></script>
     <script src="js/directives/directives.js"></script>
     <script src="js/models/profile.js"></script>
@@ -101,6 +103,7 @@
     <script src="js/controllers/password.js"></script>
     <script src="js/controllers/preferencesAlias.js"></script>
     <script src="js/controllers/copayers.js"></script>
+    <script src="js/controllers/bitIDNotice.js"></script>
   </head>
   <body ng-cloak="" class="ng-cloak">
 
@@ -110,7 +113,7 @@
         <div class="inner-wrap">
           <div ng-include="&apos;views/includes/sidebar.html&apos;" ng-if="index.hasProfile"></div>
 
-          <div notifications="right top"></div> 
+          <div notifications="right top"></div>
           <div ng-include="&apos;views/includes/password.html&apos;" ng-if="index.askPassword"></div>
           <div id="sectionContainer">
             <div id="mainSection">

@@ -63,6 +63,9 @@ angular.module('copayApp.services').factory('go', function($window, $rootScope, 
     }
   };
 
+  root.bitID = function() {
+    $state.go('bitIDNotice');
+  }
 
   root.send = function() {
     root.path('walletHome', function() {
