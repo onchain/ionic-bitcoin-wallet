@@ -25,7 +25,9 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   this.addr = {};
 
   var disableScannerListener = $rootScope.$on('dataScanned', function(event, data) {
+
     if (addressParser.isBitID(data) === true) {
+      self.setOngoingProcess('Preparing BitID Authentication');
       addressParser.setAddress(data);
       go.bitID();
     } else {
