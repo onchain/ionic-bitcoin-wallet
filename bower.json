@@ -2,7 +2,8 @@
   "name": "BitcoinWallet",
   "private": "true",
   "devDependencies": {
-    "ionic": "driftyco/ionic-bower#1.0.1"
+    "ionic": "driftyco/ionic-bower#1.0.1",
+    "angular-mocks": "~1.4.6"
   },
   "dependencies": {
     "angular-moment": "~0.10.1",
