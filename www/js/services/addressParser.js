@@ -6,7 +6,6 @@ angular.module('copayApp.services')
     var _parsed = {};
     var _address = '';
     var service = {};
-    var magicPrefix = "\x18Bitcoin Signed Message:\n";
 
     service.setAddress = function(href) {
       _address = href;
