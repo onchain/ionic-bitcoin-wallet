@@ -66,6 +66,11 @@ angular.module('copayApp.services')
       return /^(bitid:).*$/.test(address);
     };
 
+    service.isOnChain = function(address) {
+      var params = address.split("|");
+      return params.length > 3;
+    };
+
     service.isReady = function() {
       return _address != '' && _parsed != null;
     };
