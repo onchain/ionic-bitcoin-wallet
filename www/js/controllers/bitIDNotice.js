@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('bitidNoticeController',
-  function($scope, $modal, $rootScope, addressParser, go, bitIDService, configService) {
-    if(!addressParser.isReady()) {
+  function($scope, $modal, $rootScope, go, bitIDService, configService) {
+    if(!bitIDService.isReady()) {
       go.walletHome();
     }
     $scope.loading = false;
@@ -10,7 +10,7 @@ angular.module('copayApp.controllers').controller('bitidNoticeController',
     $scope.backgroundColor = config.colorFor[self.walletId] || '#4A90E2';
 
     $scope.title = "Request for Identification";
-    $scope.site_address = addressParser.getSiteAddress();
+    $scope.site_address = bitIDService.getSiteAddress();
 
     $scope.cancel = function() {
       go.walletHome();

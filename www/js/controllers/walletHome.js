@@ -1,6 +1,10 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('walletHomeController', function($scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus, isCordova, profileService, lodash, configService, rateService, storageService, bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService, addressParser, go) {
+angular.module('copayApp.controllers').controller('walletHomeController', function(
+  $scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus,
+  isCordova, profileService, lodash, configService, rateService, storageService,
+  bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService,
+  addressParser, bitIDService, go) {
 
   var self = this;
   $rootScope.hideMenuBar = false;
@@ -28,8 +32,11 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
 
     if (addressParser.isBitID(data) === true) {
       self.setOngoingProcess('Preparing BitID Authentication');
-      addressParser.setAddress(data);
+      bitIDService.setAddress(data);
       go.bitID();
+    } else if(addressParser.isOnChain(data) === true) {
+      self.setOngoingProcess('Running MultiSig command');
+      addressParser.setAddress(data);
     } else {
       go.send();
       self.setForm(data);
