@@ -27,4 +27,10 @@ describe('Address Parser Unit Test', function() {
       var invalidOnChainCommand = 'mpk|mywallet.com';
       expect(addressParser.isOnChain(invalidOnChainCommand)).toBe(false);
     }));
+
+    it('parses a bitcoin address as neither bitid nor onchain', inject(function(addressParser) {
+      var btcAddress = '1AaDWZKYGvWHmWyeuz6w1K6EsVVZGev3dk';
+      expect(addressParser.isOnChain(btcAddress)).toBe(false);
+      expect(addressParser.isBitID(btcAddress)).toBe(false);
+    }));
 });
