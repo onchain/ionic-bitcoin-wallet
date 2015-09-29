@@ -5,9 +5,26 @@ angular.module('copayApp.services')
 
     var _address = '';
     var service = {};
+    service.TYPES = {bitid: 'bitid', onchain: 'onchain', other: 'other', none: 'none'};
+    var _type = service.TYPES.none;
 
     service.setAddress = function(href) {
       _address = href;
+      _detectType(href);
+    };
+
+    service.getType = function getType() {
+      return _type;
+    }
+
+    var _detectType = function(address) {
+      if(service.isBitID(address)) {
+        _type = service.TYPES.bitid;
+      } else if(service.isOnChain(address)) {
+        _type = service.TYPES.onchain;
+      } else {
+        _type = service.TYPES.none;
+      }
     };
 
     service.isBitID = function(address) {
