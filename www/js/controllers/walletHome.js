@@ -4,7 +4,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   $scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus,
   isCordova, profileService, lodash, configService, rateService, storageService,
   bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService,
-  addressParser, bitIDService, go) {
+  addressParser, bitIDService, onChainService, go) {
 
   var self = this;
   $rootScope.hideMenuBar = false;
@@ -36,7 +36,15 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
       go.bitID();
     } else if(addressParser.isOnChain(data) === true) {
       self.setOngoingProcess('Running MultiSig command');
-      addressParser.setAddress(data);
+      onChainService.setAddress(data);
+      if(onChainService.getParsed().cmd == 'mpk') {
+        var req = onChainService.processMPK();
+        req.then(function(data, status, headers, config) {
+          alert('success');
+        }, function(data, status, headers, config) {
+          alert('error');
+        });
+      }
     } else {
       go.send();
       self.setForm(data);
