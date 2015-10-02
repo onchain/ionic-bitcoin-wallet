@@ -41,6 +41,20 @@ angular.module('copayApp.services')
       return _parsed;
     };
 
+    service.getTransaction = function () {
+      var reqOptions = service.buildGetTransactionOptions();
+      return $http(reqOptions);
+    };
+
+    service.buildGetTransactionOptions = function() {
+      var reqParams = _getExtraParams(_address.split("|"));
+      return {
+        params: reqParams,
+        method: 'GET',
+        url: service.getParsed().post_back
+      };
+    };
+
     //@TODO Extract to SignUtils service
     service.crc16 = function(addr, idx) {
       if(idx == undefined) {

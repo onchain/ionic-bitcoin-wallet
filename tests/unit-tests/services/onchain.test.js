@@ -86,4 +86,21 @@ describe('OnChain service Unit Test', function() {
     expect(reqObj.user).toEqual('980190962');
     expect(reqObj.mpk).toEqual('xpub661MyMwAqRbcF7mq7Aejj5xZNzFfgi3ABamE9FedDHVmViSzSxYTgAQGcATDo2J821q7Y9EAagjg5EP3L7uBZk11PxZU3hikL59dexfLkz3');
   }));
+
+  it('builds the request MPK object based on the command with the right parameters', inject(function(onChainService) {
+    onChainService.setAddress(txCmd);
+    var reqOpt = onChainService.buildGetTransactionOptions();
+    var reqOptKeys = Object.keys(reqOpt);
+    expect(reqOptKeys).toContain('params');
+    expect(reqOptKeys).toContain('method');
+    expect(reqOptKeys).toContain('url');
+    var reqKeys = Object.keys(reqOpt.params);
+    expect(reqKeys).not.toContain('cmd');
+    expect(reqKeys).not.toContain('service');
+    expect(reqKeys).not.toContain('post_back');
+    expect(reqKeys).toContain('user');
+    expect(reqOpt.params.user).toEqual('980190962');
+    expect(reqOpt.method).toEqual('GET');
+    expect(reqOpt.url).toEqual('hxxp://mywallet.com/sign_tx');
+  }));
 });
