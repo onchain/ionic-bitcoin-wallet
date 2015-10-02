@@ -17,6 +17,10 @@ describe('OnChain service Unit Test', function() {
       $provide.service('profileService', function() {
 
       });
+
+      $provide.service('$http', function() {
+
+      });
       // $provide.service('lodash', inject('lodash'));
     });
     inject(function(_onChainService_) {
