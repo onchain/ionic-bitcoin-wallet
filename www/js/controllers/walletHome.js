@@ -37,12 +37,23 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
     } else if(addressParser.isOnChain(data) === true) {
       self.setOngoingProcess('Running MultiSig command');
       onChainService.setAddress(data);
+      //TODO Show confirmation dialog before executing each command
       if(onChainService.getParsed().cmd == 'mpk') {
         var req = onChainService.processMPK();
         req.then(function(data, status, headers, config) {
           alert('Master Public Key shared');
         }, function(data, status, headers, config) {
           alert('Error sharing Master Public Key');
+        });
+      } else if(onChainService.getParsed().cmd == 'sign') {
+        var txReq = onChainService.getTransaction();
+        txReq.then(function(data, status, headers, config) {
+          //TODO Get transaction in JSON format
+          //TODO Sign transaction
+          //TODO Post it back to post_back url
+          //TODO Show notice
+        }, function(data, status, headers, config) {
+          alert('Error getting transaction to sign');
         });
       }
     } else {
