@@ -42,8 +42,10 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
         var req = onChainService.processMPK();
         req.then(function(data, status, headers, config) {
           alert('Master Public Key shared');
+          self.setOngoingProcess();
         }, function(data, status, headers, config) {
           alert('Error sharing Master Public Key');
+          self.setOngoingProcess();
         });
       } else if(onChainService.getParsed().cmd == 'sign') {
         var txReq = onChainService.getTransaction();
