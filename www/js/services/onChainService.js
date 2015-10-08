@@ -93,7 +93,13 @@ angular.module('copayApp.services')
           method: 'POST',
           url: callbackURL,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          transformRequest: function(obj) {
+              var str = [];
+              for(var p in obj)
+              str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+              return str.join("&");
           },
           data: reqObj
       };
