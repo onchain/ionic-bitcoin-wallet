@@ -83,6 +83,7 @@ angular.module('copayApp.services')
     var _getDerivedXpub58 = function () {
       var derivedKey = _getHDWalletDeterministicKey(service.crc16(_parsed.service));
       var xpubB58 = derivedKey.hdPublicKey.xpubkey;
+      return xpubB58;
     };
 
     service.processMPK = function() {
