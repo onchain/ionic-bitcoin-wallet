@@ -73,7 +73,7 @@ angular.module('copayApp.services')
             $scope.error = err;
             return;
           }
-          return service.signMessage();
+          return service.generateSignatureMessage();
         });
         return;
       };
