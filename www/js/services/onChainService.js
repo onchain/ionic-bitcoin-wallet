@@ -13,7 +13,7 @@ angular.module('copayApp.services')
 
     var _getExtraParams = function (params) {
       var result = {};
-      for (var i = 4; i < params.length; i++) {
+      for (var i = 4; i < params.length; i+=2) {
         result[params[i-1]] = params[i];
       }
       return result;
