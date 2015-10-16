@@ -48,8 +48,19 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
           self.setOngoingProcess();
         });
       } else if(onChainService.getParsed().cmd == 'sign') {
-        var txReq = onChainService.getTransaction();
+       var txReq = onChainService.getTransaction();
         txReq.then(function(data, status, headers, config) {
+          var txHex = onChainService.signTransaction(data.data);
+          var postReq = onChainService.postSignedRequest(txHex);
+          postReq.then(function(pData, pStatus, pHeaders, pConfig) {
+            alert('Signed transaction shared');
+            self.setOngoingProcess();
+          }, function(pData, pStatus, pHeaders, pConfig) {
+            alert('Error posting signed transaction');
+            self.setOngoingProcess();
+          });
+
+
           //TODO Get transaction in JSON format
           //TODO Sign transaction
           //TODO Post it back to post_back url
