@@ -59,12 +59,6 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
             alert('Error posting signed transaction');
             self.setOngoingProcess();
           });
-
-
-          //TODO Get transaction in JSON format
-          //TODO Sign transaction
-          //TODO Post it back to post_back url
-          //TODO Show notice
         }, function(data, status, headers, config) {
           alert('Error getting transaction to sign');
         });
