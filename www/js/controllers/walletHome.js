@@ -35,32 +35,44 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
       bitIDService.setAddress(data);
       go.bitID();
     } else if(addressParser.isOnChain(data) === true) {
-      self.setOngoingProcess('Running MultiSig command');
       onChainService.setAddress(data);
       //TODO Show confirmation dialog before executing each command
       if(onChainService.getParsed().cmd == 'mpk') {
-        var req = onChainService.processMPK();
-        req.then(function(data, status, headers, config) {
-          alert('Master Public Key shared');
-          self.setOngoingProcess();
-        }, function(data, status, headers, config) {
-          alert('Error sharing Master Public Key');
-          self.setOngoingProcess();
-        });
+        var serviceUrl = onChainService.getParsed().service;
+        self.confirmDialog('Share your Master Public Key with '+serviceUrl+'?', function(confirmed){
+          if(confirmed) {
+            self.setOngoingProcess('Sharing Master Public Key with '+serviceUrl);
+            var req = onChainService.processMPK();
+            req.then(function(data, status, headers, config) {
+              alert('Master Public Key shared');
+              self.setOngoingProcess();
+            }, function(data, status, headers, config) {
+              alert('Error sharing Master Public Key');
+              self.setOngoingProcess();
+            });
+          }
+      });
       } else if(onChainService.getParsed().cmd == 'sign') {
-        var txReq = onChainService.getTransaction();
-        txReq.then(function(data, status, headers, config) {
-          var txHex = onChainService.signTransaction(data.data);
-          var postReq = onChainService.postSignedRequest(txHex);
-          postReq.then(function(pData, pStatus, pHeaders, pConfig) {
-            alert('Signed transaction shared');
-            self.setOngoingProcess();
-          }, function(pData, pStatus, pHeaders, pConfig) {
-            alert('Error posting signed transaction');
-            self.setOngoingProcess();
-          });
-        }, function(data, status, headers, config) {
-          alert('Error getting transaction to sign');
+        var serviceUrl = onChainService.getParsed().service;
+        self.confirmDialog('Sign the transaction with '+serviceUrl+'?', function(confirmed){
+          if(confirmed) {
+            self.setOngoingProcess('Signing transaction with '+serviceUrl);
+            var txReq = onChainService.getTransaction();
+            txReq.then(function(data, status, headers, config) {
+              var txHex = onChainService.signTransaction(data.data);
+              var postReq = onChainService.postSignedRequest(txHex);
+              postReq.then(function(pData, pStatus, pHeaders, pConfig) {
+                alert('Transaction signed');
+                self.setOngoingProcess();
+              }, function(pData, pStatus, pHeaders, pConfig) {
+                alert('Error posting signed transaction');
+                self.setOngoingProcess();
+              });
+            }, function(data, status, headers, config) {
+              alert('Error getting transaction');
+              self.setOngoingProcess();
+            });
+          }
         });
       }
     } else {
