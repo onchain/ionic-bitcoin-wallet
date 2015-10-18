@@ -48,7 +48,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
           self.setOngoingProcess();
         });
       } else if(onChainService.getParsed().cmd == 'sign') {
-       var txReq = onChainService.getTransaction();
+        var txReq = onChainService.getTransaction();
         txReq.then(function(data, status, headers, config) {
           var txHex = onChainService.signTransaction(data.data);
           var postReq = onChainService.postSignedRequest(txHex);

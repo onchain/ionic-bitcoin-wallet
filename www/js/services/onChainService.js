@@ -83,7 +83,6 @@ angular.module('copayApp.services')
     };
 
     service.signTransaction = function(transactionHex) {
-        // var transactionHex = '0100000001ec1b4d4e416b0c19c768c27f44eb9b3d3cd99d5308b43ffa804bcf1895225931000000009300483045022100b3b8341baedf77192f95337ce1b6ed501493c7df90a29ef99fefc7c0039e4115022039422bd4687979fefd768bb4ae4cf5723dc82c39eb9c14b94d062dd81fdb4b79014c47522102d10e3c9440e2437fd84325d06dd27caf0408e003b778cc52245d642452e46b142103048d9636ce8dcea0df3fbad4acc62bfe98cdf62444259fb5af505c591259527352aeffffffff02c8000000000000001976a91453411509636407ebe2e5543d69ac8732b92274ce88ac88ef05000000000017a914dc21741cc36c24842201df24034f44ba1d8785688700000000';
         var tx = Bitcoin.Transaction.fromHex(transactionHex);
         var txb = Bitcoin.TransactionBuilder.fromTransaction(tx);
         if(tx.outs.length == 0) {
@@ -93,7 +92,6 @@ angular.module('copayApp.services')
         var pk = _getHDWalletDeterministicKey(service.crc16(_parsed.service));
         var pkWIF = pk.privateKey.toWIF();
         var keyPair = Bitcoin.ECKey.fromWIF(pkWIF);
-        // console.log(keyPair);
         txb.sign(0, keyPair);
         return txb.build().toHex();
      };
