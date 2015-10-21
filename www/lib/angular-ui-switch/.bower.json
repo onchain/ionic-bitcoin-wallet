@@ -1,6 +1,6 @@
 {
   "name": "angular-ui-switch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": [
     "angular-ui-switch.js",
     "angular-ui-switch.css"
@@ -30,14 +30,13 @@
     "test",
     "tests"
   ],
-  "_release": "0.1.0",
+  "_release": "0.1.1",
   "_resolution": {
     "type": "version",
-    "tag": "0.1.0",
-    "commit": "d617ee8243ee9967ca17c2cc6db8c28ba9ab77f1"
+    "tag": "0.1.1",
+    "commit": "52c93cf42f5c2dcc8a869caa8d4331181a1ab766"
   },
   "_source": "git://github.com/xpepermint/angular-ui-switch.git",
   "_target": "~0.1.0",
-  "_originalSource": "angular-ui-switch",
-  "_direct": true
+  "_originalSource": "angular-ui-switch"
 }
