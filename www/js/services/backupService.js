@@ -53,13 +53,24 @@ angular.module('copayApp.services')
       return cb();
     };
 
-    root.walletExport = function(password) {
+    root.addMetadata = function(b, opts) {
+
+      b = JSON.parse(b);
+      if (opts.historyCache) b.historyCache = opts.historyCache;
+      if (opts.addressBook) b.addressBook = opts.addressBook;
+      return JSON.stringify(b);
+    }
+
+    root.walletExport = function(password, opts) {
       if (!password) {
         return null;
       }
       var fc = profileService.focusedClient;
       try {
-        var b = fc.export({});
+        opts = opts || {};
+        var b = fc.export(opts);
+        if (opts.historyCache || opts.addressBook) b = root.addMetadata(b, opts);
+
         var e = sjcl.encrypt(password, b, {
           iter: 10000
         });
@@ -70,12 +81,13 @@ angular.module('copayApp.services')
       };
     };
 
-    root.walletDownload = function(password, cb) {
+    root.walletDownload = function(password, opts, cb) {
       var fc = profileService.focusedClient;
-      var ew = root.walletExport(password);
+      var ew = root.walletExport(password, opts);
       if (!ew) return cb('Could not create backup');
 
       var walletName = (fc.alias || '') + (fc.alias ? '-' : '') + fc.credentials.walletName;
+      if (opts.noSign) walletName = walletName + '-noSign'
       var filename = walletName + '-Copaybackup.aes.json';
       _download(ew, filename, cb)
     };

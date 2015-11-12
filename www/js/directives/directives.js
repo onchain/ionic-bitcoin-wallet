@@ -37,7 +37,7 @@ angular.module('copayApp.directives')
             if (/^bitcoin:/.test(value)) {
               var uri, isAddressValid;
               var isUriValid = URI.isValid(value);
-              if (isUriValid) { 
+              if (isUriValid) {
                 uri = new URI(value);
                 isAddressValid = Address.isValid(uri.address.toString(), networkName)
               }
@@ -85,9 +85,8 @@ angular.module('copayApp.directives')
       };
     }
   ])
-  .directive('validAmount', ['configService', '$locale',
-    function(configService, locale) {
-      var formats = locale.NUMBER_FORMATS;
+  .directive('validAmount', ['configService',
+    function(configService) {
 
       return {
         require: 'ngModel',
@@ -96,13 +95,13 @@ angular.module('copayApp.directives')
             var settings = configService.getSync().wallet.settings;
             var vNum = Number((value * settings.unitToSatoshi).toFixed(0));
 
-            if (typeof value == 'undefined') {
+            if (typeof value == 'undefined' || value == 0) {
               ctrl.$pristine = true;
             }
 
             if (typeof vNum == "number" && vNum > 0) {
               var decimals = Number(settings.unitDecimals);
-              var sep_index = ('' + value).indexOf(formats.DECIMAL_SEP);
+              var sep_index = ('' + value).indexOf('.');
               var str_value = ('' + value).substring(sep_index + 1);
               if (sep_index > 0 && str_value.length > decimals) {
                 ctrl.$setValidity('validAmount', false);
@@ -163,27 +162,21 @@ angular.module('copayApp.directives')
       }
     }
   })
-  .directive('contact', function() {
+  .directive('contact', ['addressbookService', function(addressbookService) {
     return {
       restrict: 'E',
       link: function(scope, element, attrs) {
-        if (!scope.wallet) return;
-
-        var address = attrs.address;
-        var contact = scope.wallet.addressBook[address];
-        if (contact && !contact.hidden) {
-          element.append(contact.label);
-          element.attr('tooltip', attrs.address);
-        } else {
-          element.append(address);
-        }
-
-        element.bind('click', function() {
-          selectText(element[0]);
+        var addr = attrs.address;
+        addressbookService.getLabel(addr, function(label) {
+          if (label) {
+            element.append(label);
+          } else {
+            element.append(addr);
+          }
         });
       }
     };
-  })
+  }])
   .directive('highlightOnChange', function() {
     return {
       restrict: 'A',
@@ -296,4 +289,32 @@ angular.module('copayApp.directives')
         });
       }
     };
+  })
+  .directive('menuToggle', function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      templateUrl: 'views/includes/menu-toggle.html'
+    }
+  })
+  .directive('logo', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        width: "@",
+        negative: "="
+      },
+      controller: function($scope) {
+        $scope.logo_url = $scope.negative ? 'img/logo-negative.svg' : 'img/logo.svg';
+      },
+      replace: true,
+      template: '<img ng-src="{{ logo_url }}" alt="Copay">'
+    }
+  })
+  .directive('availableBalance', function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      templateUrl: 'views/includes/available-balance.html'
+    }
   });

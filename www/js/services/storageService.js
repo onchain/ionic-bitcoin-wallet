@@ -25,13 +25,17 @@ angular.module('copayApp.services')
     };
 
     var encryptOnMobile = function(text, cb) {
-      getUUID(function(uuid) {
-        if (uuid) {
-          $log.debug('Encrypting profile');
-          text = sjcl.encrypt(uuid, text);
-        }
-        return cb(null, text);
-      });
+
+      // UUID encryption is disabled.
+      return cb(null, text);
+      //
+      // getUUID(function(uuid) {
+      //   if (uuid) {
+      //     $log.debug('Encrypting profile');
+      //     text = sjcl.encrypt(uuid, text);
+      //   }
+      //   return cb(null, text);
+      // });
     };
 
 
@@ -41,15 +45,30 @@ angular.module('copayApp.services')
         json = JSON.parse(text);
       } catch (e) {};
 
-      if (!json.iter || !json.ct)
+      if (!json) return cb('Could not access storage')
+
+      if (!json.iter || !json.ct) {
+        $log.debug('Profile is not encrypted');
         return cb(null, text);
+      }
 
       $log.debug('Profile is encrypted');
       getUUID(function(uuid) {
+        $log.debug('Device UUID:' + uuid);
         if (!uuid)
-          return cb(new Error('Could not decrypt localstorage profile'));
+          return cb('Could not decrypt storage: could not get device ID');
 
-        text = sjcl.decrypt(uuid, text);
+        try {
+          text = sjcl.decrypt(uuid, text);
+
+          $log.info('Migrating to unencrypted profile');
+          return storage.set('profile', text, function(err) {
+            return cb(err, text);
+          });
+        } catch(e) {
+          $log.warn('Decrypt error: ', e);
+          return cb('Could not decrypt storage: device ID mismatch');
+        };
         return cb(null, text);
       });
     };
@@ -103,7 +122,6 @@ angular.module('copayApp.services')
       storage.get('profile', function(err, str) {
 
         if (err || !str)
-        // Migrate ?
           return cb(err);
 
         decryptOnMobile(str, function(err, str) {
@@ -112,6 +130,7 @@ angular.module('copayApp.services')
           try {
             p = Profile.fromString(str);
           } catch (e) {
+            $log.debug('Could not read profile:', e);
             err = new Error('Could not read profile:' + p);
           }
           return cb(err, p);
@@ -124,7 +143,7 @@ angular.module('copayApp.services')
     };
 
     root.storeFocusedWalletId = function(id, cb) {
-      storage.set('focusedWalletId', id||'', cb);
+      storage.set('focusedWalletId', id || '', cb);
     };
 
     root.getFocusedWalletId = function(cb) {
@@ -151,8 +170,12 @@ angular.module('copayApp.services')
       storage.get('backup-' + walletId, cb);
     };
 
-    root.setCleanAndScanAddresses = function(cb) {
-      storage.set('CleanAndScanAddresses', Date.now(), cb);
+    root.clearBackupFlag = function(walletId, cb) {
+      storage.remove('backup-' + walletId, cb);
+    };
+
+    root.setCleanAndScanAddresses = function(walletId, cb) {
+      storage.set('CleanAndScanAddresses', walletId, cb);
     };
 
     root.getCleanAndScanAddresses = function(cb) {
@@ -191,6 +214,42 @@ angular.module('copayApp.services')
     root.getRemotePrefsStoredFlag = function(cb) {
       storage.get('remotePrefStored', cb);
     };
+
+    root.setGlideraToken = function(network, token, cb) {
+      storage.set('glideraToken-' + network, token, cb);
+    };
+
+    root.getGlideraToken = function(network, cb) {
+      storage.get('glideraToken-' + network, cb);
+    };
+
+    root.removeGlideraToken = function(network, cb) {
+      storage.remove('glideraToken-' + network, cb);
+    };
+
+    root.setAddressbook = function(network, addressbook, cb) {
+      storage.set('addressbook-' + network, addressbook, cb);
+    };
+
+    root.getAddressbook = function(network, cb) {
+      storage.get('addressbook-' + network, cb);
+    };
+
+    root.removeAddressbook = function(network, cb) {
+      storage.remove('addressbook-' + network, cb);
+    };
+
+    root.setTxHistory = function(txs, walletId, cb) {
+      storage.set('txsHistory-' + walletId, txs, cb);
+    }
+
+    root.getTxHistory = function(walletId, cb) {
+      storage.get('txsHistory-' + walletId, cb);
+    }
+
+    root.removeTxHistory = function(walletId, cb) {
+      storage.remove('txsHistory-' + walletId, cb);
+    }
 
     return root;
   });

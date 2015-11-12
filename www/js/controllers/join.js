@@ -1,166 +1,143 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('joinController',
-  function($scope, $rootScope, $timeout, go, isMobile, notification, profileService, isCordova, $modal, gettext) {
+  function($scope, $rootScope, $timeout, go, notification, profileService, configService, isCordova, storageService, applicationService, $modal, gettext, lodash, ledger, trezor, isChromeApp, isDevel,derivationPathHelper) {
 
     var self = this;
+    var defaults = configService.getDefaults();
+    $scope.bwsurl = defaults.bws.url;
+    $scope.derivationPath = derivationPathHelper.default;
+    $scope.account = 1;
 
-    //TODO : make one function - this was copied from topbar.js
-    var cordovaOpenScanner = function() {
-      window.ignoreMobilePause = true;
-      window.plugins.spinnerDialog.show(null, 'Preparing camera...', true);
-      $timeout(function() {
-        cordova.plugins.barcodeScanner.scan(
-          function onSuccess(result) {
-            $timeout(function() {
-              window.plugins.spinnerDialog.hide();
-              window.ignoreMobilePause = false;
-            }, 100);
-            if (result.cancelled) return;
-
-            $timeout(function() {
-              var data = result.text;
-              $scope.secret = data;
-              $scope.joinForm.secret.$setViewValue(data);
-              $scope.joinForm.secret.$render();
-            }, 1000);
-          },
-          function onError(error) {
-            $timeout(function() {
-              window.ignoreMobilePause = false;
-              window.plugins.spinnerDialog.hide();
-            }, 100);
-            alert('Scanning error');
-          }
-        );
-      }, 100);
+    this.onQrCodeScanned = function(data) {
+      $scope.secret = data;
+      $scope.joinForm.secret.$setViewValue(data);
+      $scope.joinForm.secret.$render();
     };
 
-    var modalOpenScanner = function() {
-      var _scope = $scope;
-      var ModalInstanceCtrl = function($scope, $rootScope, $modalInstance) {
-        // QR code Scanner
-        var video;
-        var canvas;
-        var $video;
-        var context;
-        var localMediaStream;
 
-        var _scan = function(evt) {
+    var updateSeedSourceSelect = function() {
+      self.seedOptions = [{
+        id: 'new',
+        label: gettext('New Random Seed'),
+      }, {
+        id: 'set',
+        label: gettext('Specify Seed...'),
+      }];
+      $scope.seedSource = self.seedOptions[0];
 
-          if (localMediaStream) {
-            context.drawImage(video, 0, 0, 300, 225);
-            try {
-              qrcode.decode();
-            } catch (e) {
-              //qrcodeError(e);
-            }
-          }
-          $timeout(_scan, 500);
-        };
 
-        var _scanStop = function() {
-          if (localMediaStream && localMediaStream.stop) localMediaStream.stop();
-          localMediaStream = null;
-          video.src = '';
-        };
+      if (isChromeApp) {
+        self.seedOptions.push({
+          id: 'ledger',
+          label: 'Ledger Hardware Wallet',
+        });
+      }
 
-        qrcode.callback = function(data) {
-          _scanStop();
-          $modalInstance.close(data);
-        };
-
-        var _successCallback = function(stream) {
-          video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
-          localMediaStream = stream;
-          video.play();
-          $timeout(_scan, 1000);
-        };
-
-        var _videoError = function(err) {
-          $scope.cancel();
-        };
-
-        var setScanner = function() {
-
-          navigator.getUserMedia = navigator.getUserMedia ||
-            navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia;
-          window.URL = window.URL || window.webkitURL ||
-            window.mozURL || window.msURL;
-        };
-
-        $scope.init = function() {
-          setScanner();
-          $timeout(function() {
-            canvas = document.getElementById('qr-canvas');
-            context = canvas.getContext('2d');
-
-            video = document.getElementById('qrcode-scanner-video');
-            $video = angular.element(video);
-            canvas.width = 300;
-            canvas.height = 225;
-            context.clearRect(0, 0, 300, 225);
-
-            navigator.getUserMedia({
-              video: true
-            }, _successCallback, _videoError);
-          }, 500);
-        };
-
-        $scope.cancel = function() {
-          _scanStop();
-          $modalInstance.dismiss('cancel');
-        };
-      };
-
-      var modalInstance = $modal.open({
-        templateUrl: 'views/modals/scanner.html',
-        windowClass: 'full',
-        controller: ModalInstanceCtrl,
-        backdrop: 'static',
-        keyboard: false
-      });
-      modalInstance.result.then(function(data) {
-        $scope.secret = data;
-        $scope.joinForm.secret.$setViewValue(data);
-        $scope.joinForm.secret.$render();
-      });
-
-    };
-
-    this.openScanner = function() {
-      if (isCordova) {
-        cordovaOpenScanner();
-      } else {
-        modalOpenScanner();
+      if (isChromeApp || isDevel) {
+        self.seedOptions.push({
+          id: 'trezor',
+          label: 'Trezor Hardware Wallet',
+        });
       }
     };
 
+    this.setSeedSource = function(src) {
+      self.seedSourceId = $scope.seedSource.id;
+
+      $timeout(function() {
+        $rootScope.$apply();
+      });
+    };
 
     this.join = function(form) {
       if (form && form.$invalid) {
         self.error = gettext('Please enter the required fields');
         return;
       }
-      self.loading = true;
 
+      var opts = {
+        secret: form.secret.$modelValue,
+        myName: form.myName.$modelValue,
+        bwsurl: $scope.bwsurl,
+      }
+
+      var setSeed = self.seedSourceId =='set';
+      if (setSeed) {
+        var words = form.privateKey.$modelValue;
+        if (words.indexOf(' ') == -1 && words.indexOf('prv') == 1 && words.length > 108) {
+          opts.extendedPrivateKey = words;
+        } else {
+          opts.mnemonic = words;
+        }
+        opts.passphrase = form.passphrase.$modelValue;
+
+        var pathData = derivationPathHelper.parse($scope.derivationPath);
+        if (!pathData) {
+          this.error = gettext('Invalid derivation path');
+          return;
+        }
+        opts.account = pathData.account;
+        opts.networkName = pathData.networkName;
+        opts.derivationStrategy = pathData.derivationStrategy;
+      } else {
+        opts.passphrase = form.createPassphrase.$modelValue;
+      }
+
+      if (setSeed && !opts.mnemonic && !opts.extendedPrivateKey) {
+        this.error = gettext('Please enter the wallet seed');
+        return;
+      }
+
+      if (self.seedSourceId == 'ledger' || self.seedSourceId == 'trezor') {
+        var account = $scope.account;
+        if (!account || account < 1) {
+          this.error = gettext('Invalid account number');
+          return;
+        }
+
+        if ( self.seedSourceId == 'trezor')
+          account = account - 1;
+
+        opts.account =  account;
+        self.hwWallet = self.seedSourceId == 'ledger' ? 'Ledger' : 'Trezor';
+        var src = self.seedSourceId == 'ledger' ? ledger : trezor;
+
+        src.getInfoForNewWallet(true, account, function(err, lopts) {
+          self.hwWallet = false;
+          if (err) {
+            self.error = err;
+            $scope.$apply();
+            return;
+          }
+          opts = lodash.assign(lopts, opts);
+          self._join(opts);
+        });
+      } else {
+        self._join(opts);
+      }
+    };
+
+    this._join = function(opts) {
+      self.loading = true;
       $timeout(function() {
-        profileService.joinWallet({
-          secret: form.secret.$modelValue,
-          extendedPrivateKey: form.privateKey.$modelValue,
-          myName: form.myName.$modelValue
-        }, function(err) {
+        profileService.joinWallet(opts, function(err) {
           if (err) {
             self.loading = false;
-            self.error = gettext('Could not join wallet: ') +  (err.message ? err.message : err);
+            self.error = err;
             $rootScope.$apply();
-            return
+            return;
           }
+
           $timeout(function() {
-            go.walletHome();
+            var fc = profileService.focusedClient;
+            if (fc.isComplete() && (opts.mnemonic || opts.externalSource || opts.extendedPrivateKey))
+              $rootScope.$emit('Local/WalletImported', fc.credentials.walletId);
           }, 2000);
         });
       }, 100);
-    }
+    };
+
+    updateSeedSourceSelect();
+    self.setSeedSource('new');
   });
