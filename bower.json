@@ -18,6 +18,8 @@
     "qrcode-decoder-js": "*",
     "foundation": "~5.5.2",
     "foundation-icon-fonts": "*",
-    "animate.css": "~3.3.0"
+    "animate.css": "~3.3.0",
+    "qrcode-decoder-js": "*",
+    "trezor-connect": "~1.0.1"
   }
 }
