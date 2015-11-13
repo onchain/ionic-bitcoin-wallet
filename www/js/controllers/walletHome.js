@@ -40,7 +40,6 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
       go.bitID();
     } else if(addressParser.isOnChain(data) === true) {
       onChainService.setAddress(data);
-      //TODO Show confirmation dialog before executing each command
       if(onChainService.getParsed().cmd == 'mpk') {
         var serviceUrl = onChainService.getParsed().service;
         self.confirmDialog('Share your Master Public Key with '+serviceUrl+'?', function(confirmed){
@@ -1326,6 +1325,28 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
 
   this._doSendAll = function(amount, feeRate) {
     this.setForm(null, amount, null, feeRate);
+  };
+
+  this.confirmDialog = function(msg, cb) {
+    if (isCordova) {
+      navigator.notification.confirm(
+        msg,
+        function(buttonIndex) {
+          if (buttonIndex == 1) {
+            $timeout(function() {
+              return cb(true);
+            }, 1);
+          } else {
+            return cb(false);
+          }
+        }
+      );
+    } else if (isChromeApp) {
+      // No feedback, alert/confirm not supported.
+      return cb(true);
+    } else {
+      return cb(confirm(msg));
+    }
   };
 
   this.sendAll = function(amount, feeStr, feeRate) {
