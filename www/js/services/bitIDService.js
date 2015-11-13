@@ -78,8 +78,8 @@ angular.module('copayApp.services')
         return;
       };
 
-      var utils = bwcService.getUtils();
-      var HDPrivateKey = utils.Bitcore.HDPrivateKey;
+      var Bitcore = bwcService.getBitcore();
+      var HDPrivateKey = Bitcore.HDPrivateKey;
       var retrieved = new HDPrivateKey(fc.credentials.xPrivKey);
       var sha256URL = Bitcoin.crypto.sha256(_getBitIDSiteURI());
       var sha32uri = sha256URL.readInt32LE(1);

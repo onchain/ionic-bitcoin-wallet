@@ -98,8 +98,8 @@ angular.module('copayApp.services')
 
     var _getHDWalletDeterministicKey = function(idx) {
       var fc = profileService.focusedClient;
-      var utils = bwcService.getUtils();
-      var HDPrivateKey = utils.Bitcore.HDPrivateKey;
+      var Bitcore = bwcService.getBitcore();
+      var HDPrivateKey = Bitcore.HDPrivateKey;
       var retrieved = new HDPrivateKey(fc.credentials.xPrivKey);
       var derivedByArgument = retrieved.derive(idx);
       return derivedByArgument;
