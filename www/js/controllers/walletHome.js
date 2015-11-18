@@ -63,15 +63,20 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
             var txReq = onChainService.getTransaction();
             txReq.then(function(data, status, headers, config) {
               self.setOngoingProcess('Sending singature');
-              var txHex = onChainService.signTransaction(data.data);
-              var postReq = onChainService.postSignedRequest(txHex);
-              postReq.then(function(pData, pStatus, pHeaders, pConfig) {
-                alert('Transaction signed');
+              try {
+                var txHex = onChainService.signTransaction(data.data);
+                var postReq = onChainService.postSignedRequest(txHex);
+                postReq.then(function(pData, pStatus, pHeaders, pConfig) {
+                  alert('Transaction signed');
+                  self.setOngoingProcess();
+                }, function(pData, pStatus, pHeaders, pConfig) {
+                  alert('Error posting signed transaction');
+                  self.setOngoingProcess();
+                });
+              } catch (err) {
+                alert(err);
                 self.setOngoingProcess();
-              }, function(pData, pStatus, pHeaders, pConfig) {
-                alert('Error posting signed transaction');
-                self.setOngoingProcess();
-              });
+              }
             }, function(data, status, headers, config) {
               alert('Error getting transaction');
               self.setOngoingProcess();
