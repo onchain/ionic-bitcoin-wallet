@@ -62,6 +62,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
             self.setOngoingProcess('Signing transaction with '+serviceUrl);
             var txReq = onChainService.getTransaction();
             txReq.then(function(data, status, headers, config) {
+              self.setOngoingProcess('Sending singature');
               var txHex = onChainService.signTransaction(data.data);
               var postReq = onChainService.postSignedRequest(txHex);
               postReq.then(function(pData, pStatus, pHeaders, pConfig) {
