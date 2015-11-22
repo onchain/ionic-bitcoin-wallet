@@ -91,7 +91,7 @@ angular.module('copayApp.services')
         }
         var pk = _getHDWalletDeterministicKey(service.crc16(_parsed.service));
         var pkWIF = pk.privateKey.toWIF();
-        var keyPair = Bitcoin.ECKey.fromWIF(pkWIF);
+        var keyPair = Bitcoin.ECPair.fromWIF(pkWIF);
         txb.sign(0, keyPair);
         return txb.build().toHex();
      };
