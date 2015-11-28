@@ -48,20 +48,22 @@ angular.module('copayApp.services')
 
     service.buildGetTransactionOptions = function() {
       var reqParams = _getExtraParams(_address.split("|"));
+      var callbackURL = service.getParsed().post_back;
       return {
         transformResponse: undefined,
         params: reqParams,
         method: 'GET',
-        url: service.getParsed().post_back
+        url: callbackURL
       };
     };
 
     service.postSignedRequest = function(txHex) {
       var reqParams = _getExtraParams(_address.split("|"));
       reqParams['tx'] = txHex;
+      var callbackURL = service.getParsed().post_back;
       return $http({
         method: 'POST',
-        url: service.getParsed().post_back,
+        url: callbackURL,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         transformRequest: function(obj) {
             var str = [];
