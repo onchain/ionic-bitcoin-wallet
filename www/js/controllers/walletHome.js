@@ -37,7 +37,9 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
     if (addressParser.isBitID(data) === true) {
       self.setOngoingProcess('Preparing BitID Authentication');
       bitIDService.setAddress(data);
-      go.bitID();
+      go.bitID().then(function() {
+        self.setOngoingProcess();
+      });
     } else if(addressParser.isOnChain(data) === true) {
       onChainService.setAddress(data);
       if(onChainService.getParsed().cmd == 'mpk') {
