@@ -49,6 +49,7 @@ angular.module('copayApp.services')
     service.buildGetTransactionOptions = function() {
       var reqParams = _getExtraParams(_address.split("|"));
       return {
+        transformResponse: undefined,
         params: reqParams,
         method: 'GET',
         url: service.getParsed().post_back
@@ -68,6 +69,7 @@ angular.module('copayApp.services')
               str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
             return str.join("&");
         },
+        transformResponse: undefined,
         data: reqParams
       });
     };
@@ -133,6 +135,7 @@ angular.module('copayApp.services')
                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
               return str.join("&");
           },
+          transformResponse: undefined,
           data: reqObj
       };
 
