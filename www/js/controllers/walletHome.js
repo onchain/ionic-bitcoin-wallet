@@ -58,33 +58,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
           }
       });
       } else if(onChainService.getParsed().cmd == 'sign') {
-        var serviceUrl = onChainService.getParsed().service;
-        self.confirmDialog('Sign the transaction with '+serviceUrl+'?', function(confirmed){
-          if(confirmed) {
-            self.setOngoingProcess('Signing transaction with '+serviceUrl);
-            var txReq = onChainService.getTransaction();
-            txReq.then(function(data, status, headers, config) {
-              self.setOngoingProcess('Sending singature');
-              try {
-                var txHex = onChainService.signTransaction(data.data);
-                var postReq = onChainService.postSignedRequest(txHex);
-                postReq.then(function(pData, pStatus, pHeaders, pConfig) {
-                  alert('Transaction signed');
-                  self.setOngoingProcess();
-                }, function(pData, pStatus, pHeaders, pConfig) {
-                  alert('Error posting signed transaction');
-                  self.setOngoingProcess();
-                });
-              } catch (err) {
-                alert(err);
-                self.setOngoingProcess();
-              }
-            }, function(data, status, headers, config) {
-              alert('Error getting transaction');
-              self.setOngoingProcess();
-            });
-          }
-        });
+        _signTransaction();
       }
     } else {
       go.send();
@@ -92,6 +66,37 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
       $rootScope.$emit('Local/SetTab', 'send');
     }
   });
+
+  var _signTransaction = function() {
+    var serviceUrl = onChainService.getParsed().service;
+    self.confirmDialog('Sign the transaction with '+serviceUrl+'?', function(confirmed){
+      if(confirmed) {
+        self.setOngoingProcess('Signing transaction with '+serviceUrl);
+        var txReq = onChainService.getTransaction();
+        txReq.then(function(data, status, headers, config) {
+          self.setOngoingProcess('Sending singature');
+          try {
+            var txHex = onChainService.signTransaction(data.data);
+            var postReq = onChainService.postSignedRequest(txHex);
+            postReq.then(function(pData, pStatus, pHeaders, pConfig) {
+              alert('Transaction signed');
+              self.setOngoingProcess();
+            }, function(pData, pStatus, pHeaders, pConfig) {
+              var message = pData.data.message || '';
+              alert('Error posting signed transaction. '+message);
+              self.setOngoingProcess();
+            });
+          } catch (err) {
+            alert(err);
+            self.setOngoingProcess();
+          }
+        }, function(data, status, headers, config) {
+          alert('Error getting transaction');
+          self.setOngoingProcess();
+        });
+      }
+    });
+  };
 
   var disablePaymentUriListener = $rootScope.$on('paymentUri', function(event, uri) {
     $timeout(function() {
