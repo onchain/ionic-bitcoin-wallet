@@ -82,7 +82,7 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
               alert('Transaction signed');
               self.setOngoingProcess();
             }, function(pData, pStatus, pHeaders, pConfig) {
-              var message = pData.data.message || '';
+              var message = pData.message || '';
               alert('Error posting signed transaction. '+message);
               self.setOngoingProcess();
             });
