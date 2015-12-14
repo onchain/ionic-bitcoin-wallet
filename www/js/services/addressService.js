@@ -1,7 +1,7 @@
 'use strict';
 'use strict';
 angular.module('copayApp.services')
-  .factory('addressService', function(storageService, profileService, $log, $timeout, lodash) {
+  .factory('addressService', function(storageService, profileService, $log, $timeout, lodash, bwsError, gettextCatalog) {
     var root = {};
 
 
@@ -28,14 +28,21 @@ angular.module('copayApp.services')
 
       client.createAddress(function(err, addr) {
         if (err) {
+          var prefix = gettextCatalog.getString('Could not create address');
           if (err.error && err.error.match(/locked/gi)) {
             $log.debug(err.error);
             return $timeout(function() {
               root._createAddress(walletId, cb);
             }, 5000);
+          } else if (err.code && err.code == 'MAIN_ADDRESS_GAP_REACHED') {
+            $log.warn(err.message);
+            prefix = null;
+            client.getMainAddresses({reverse: true, limit : 1}, function(err, addr) {
+              if (err) return cb(err);
+              return cb(null, addr[0].address);
+            });
           }
-          $log.debug('Creating address ERROR:', err);
-          return cb(err);
+          return bwsError.cb(err, prefix, cb);
         }
         return cb(null, addr.address);
       });

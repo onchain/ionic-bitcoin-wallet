@@ -78,19 +78,19 @@ angular.module('copayApp.services')
         return;
       };
 
-      var utils = bwcService.getUtils();
-      var HDPrivateKey = utils.Bitcore.HDPrivateKey;
+      var Bitcore = bwcService.getBitcore();
+      var HDPrivateKey = Bitcore.HDPrivateKey;
       var retrieved = new HDPrivateKey(fc.credentials.xPrivKey);
       var sha256URL = Bitcoin.crypto.sha256(_getBitIDSiteURI());
       var sha32uri = sha256URL.readInt32LE(1);
       var derivedByArgument = retrieved.derive("m/0'/0xb11e'/"+sha32uri+"/0");
       var derPriv = derivedByArgument.privateKey;
       var derivedWIF = derPriv.toWIF();
-      var keyPair = Bitcoin.ECKey.fromWIF(derivedWIF);
+      var keyPair = Bitcoin.ECPair.fromWIF(derivedWIF);
       var message = _getMessageToSign();
-      var signedMessage = Bitcoin.Message.sign(keyPair, message);
+      var signedMessage = Bitcoin.message.sign(keyPair, message);
       var signed = signedMessage.toString('base64');
-      var pubKeyAddress = keyPair.pub.getAddress().toBase58Check();
+      var pubKeyAddress = keyPair.getAddress();
       var fullMessage = _createMessage(signed, pubKeyAddress);
       return fullMessage;
     };

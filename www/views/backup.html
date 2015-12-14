@@ -5,68 +5,129 @@
 </div>
 
 
+<div class="content preferences" ng-controller="wordsController as wordsC">
+  <h4></h4>
 
-<div class="content p20v" ng-controller="backupController as backup">
-  <div class="row m20t">
-    <div class="columns" ng-show="!backup.backupWalletPlainText && !backup.error">
-      <div class="text-warning size-14 m10v" ng-show="backup.isEncrypted">
-        <i class="fi-alert size-12"></i>
-        <span translate> The private key for this wallet is encrypted. Exporting a backup will keep the private key encrypted in the backup archive.</span>
+  <div class="box-notification" ng-show="wordsC.error">
+    <span class="text-warning">
+    {{wordsC.error|translate}}
+    </span>
+  </div>
 
-      </div>
 
-      <label for="password" translate>Set up a Password for your backup</label>
-      <div class="input">
-        <input type="password" class="form-control"
-        placeholder="{{'Your backup password'|translate}}"
-        name="password" ng-model="backup.password">
-      </div>
 
-      <label for="password" translate>Repeat password</label>
-      <div class="input">
-        <input type="password" class="form-control"
-        placeholder="{{'Repeat password'|translate}}"
-        name="password" ng-model="backup.repeatpassword">
-      </div>
-
-      <button class="black round expand" ng-click="backup.downloadWalletBackup()"
-        ng-disabled="(!backup.password || backup.password != backup.repeatpassword)"
-        ng-style="{'background-color':index.backgroundColor}"
-        ng-show="!backup.isSafari && !backup.isCordova"><i class="fi-download"></i>
-        <span translate>Download backup</span></button>
-      <button class="black round expand" ng-click="backup.viewWalletBackup()"
-        ng-disabled="(!backup.password || backup.password != backup.repeatpassword)"
-        ng-style="{'background-color':index.backgroundColor}"
-        ng-show="backup.isSafari && !backup.isCordova"><i class="fi-eye"></i>
-        <span translate>View backup</span></button>
-      <div ng-show="backup.isCordova">
-        <h4 translate>Backup options</h4>
-        <button class="black round expand"  ng-disabled="(!backup.password || backup.password != backup.repeatpassword)"
-          ng-style="{'background-color':index.backgroundColor}"
-          ng-click="backup.copyWalletBackup()"><i class="fi-clipboard-pencil"></i>
-          <span translate>Copy to clipboard</span></button>
-        <button class="black round expand"  ng-disabled="(!backup.password || backup.password != backup.repeatpassword)"
-          ng-style="{'background-color':index.backgroundColor}"
-          ng-click="backup.sendWalletBackup()"><i class="fi-mail"></i>
-          <span translate>Send by email</span></button>
+  <div ng-show="wordsC.mnemonicWords || (wordsC.credentialsEncrypted && !wordsC.deleted)">
+    <div class="row"  ng-show="index.n==1">
+      <div class="m10t columns size-14 text-gray">
+        <span translate>
+          You need the wallet seed to restore this personal wallet.
+        </span>
+        <span translate class="text-bold">
+          Write it down and keep them somewhere safe.
+        </span>
       </div>
     </div>
-  </div>
-  <div class="row m20b" ng-show="backup.backupWalletPlainText">
-    <div class="large-12 columns">
-      <h3 translate>Copy backup to a safe place</h3>
-      <div class="input">
-        <textarea rows="12">{{backup.backupWalletPlainText}}</textarea>
+    <div class="row" ng-show="(index.n>1 && index.m != index.n )">
+      <div class="m10t columns size-14 text-gray">
+        <span translate>
+          To restore this {{index.m}}-{{index.n}} <b>shared</b> wallet you will need
+        </span>:
+        <ol class="m10t columns size-14 text-gray">
+          <li translate>Your wallet seed and access to the server that coordinated the initial wallet creation. You still need {{index.m}} keys to spend.</li>
+          <li translate><b>OR</b> the wallet seed of <b>all</b> copayers in the wallet</li>
+          <li translate><b>OR</b> 1 wallet export file and the remaining quorum of wallet seeds (e.g. in a 3-5 wallet: 1 wallet export file + 2 wallet seeds of any of the other copayers).</li>
+        </ol>
+        </span>
       </div>
-      <div class="size-12 text-gray text-right">
-        <i class="icon-compose"></i>
-        <span translate>Copy this text as it is to a safe place (notepad or email)</span>
+    </div>
+    <div class="row" ng-show="(index.n>1 && index.m == index.n )">
+      <div class="m10t columns size-14 text-gray">
+        <span translate>
+          To restore this {{index.m}}-{{index.n}} <b>shared</b> wallet you will need
+        </span>:
+        <ol class="m10t columns size-14 text-gray">
+          <li translate>Your wallet seed and access to the server that coordinated the initial wallet creation. You still need {{index.m}} keys to spend.</li>
+          <li translate><b>OR</b> the wallet seeds of <b>all</b> copayers in the wallet</li>
+        </ol>
+        </span>
       </div>
     </div>
   </div>
 
-  <div class="m10 size-14 text-gray" translate>
-    * You can safely install your backup on another device and use your wallet from multiple devices at the same time.
+  <div class="row m20t" ng-show="wordsC.deleted">
+    <div class="columns size-14 text-gray text-center" translate>
+        Wallet seed not available. You can still export it from Advanced &gt; Export.
+    </div>
+  </div>
+ 
+  <div ng-show="wordsC.mnemonicWords || (wordsC.credentialsEncrypted && !wordsC.deleted)">
+    <div class="row">
+        <div class="m10t columns">
+          <a class="button outline light-gray expand tiny" ng-click="wordsC.toggle()">
+            <i class="fi-widget m3r"></i>
+            <span translate ng-hide="wordsC.show">Show Wallet Seed</span>
+            <span translate ng-hide="!wordsC.show">Hide Wallet Seed</span>
+            <i ng-if="!wordsC.show" class="icon-arrow-down4"></i>
+            <i ng-if="wordsC.show" class="icon-arrow-up4"></i>
+          </a>
+        </div>
+    </div>
+
+
+    <div class="row m10t m10b" ng-show="wordsC.show">
+      <div class="small-centered  text-gray columns size-14 text-center" translate>
+          Your Wallet Seed
+      </div>
+    </div>
+
+    <div class="row" ng-show="wordsC.show">
+        <div class="columns">
+        <div class="p10" style="background:white" ng-class="{'enable_text_select': index.network == 'testnet'}">
+          <span ng-repeat="word in wordsC.mnemonicWords track by $index"><span style="white-space:nowrap">{{word}}</span><span ng-show="wordsC.useIdeograms">&#x3000;</span> </span>  
+        </div>
+        </div>
+    </div>
+
+    <div class="row m10t m20b" ng-show="wordsC.show">
+        <div class="columns" ng-show="wordsC.mnemonicHasPassphrase">
+          <span class="size-12">
+            <i class="fi-alert"></i>
+            <span translate>
+            WARNING: This seed was created with a passphrase. To recover this wallet both the mnemonic and passphrase are needed.
+            </span>
+          </span>
+        </div>
+    </div>
+
+    <div class="row" ng-show="wordsC.show">
+        <div class="m10t text-center columns">
+          <div class="size-12 text-gray">
+            <span translate>
+              Once you have copied your wallet seed down, it is recommended to delete it from this device.
+            </span>
+          </div>
+          <button class="button outline m10t round dark-gray tiny" ng-click="wordsC.delete()">
+            <i class="fi-trash"></i> 
+            <span translate>
+              DELETE WORDS
+            </span>
+          </button>
+        </div>
+    </div>
+
+    <!-- hide this in multisig just to show less text -->
+    <div class="row m20t"  ng-show="index.n==1">
+      <div class="columns size-12 text-gray">
+        <div class="p10t"  style="border-top:1px solid #ccc">
+          <span translate>You can safely install your wallet on another device and use it from multiple devices at the same time.</span> 
+          <a href="#" ng-click="$root.openExternalLink('https://github.com/bitpay/copay/blob/master/README.md#copay-backups-and-recovery')" translate>
+            Learn more about Copay backups
+          </a>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </div>
+<div class="extra-margin-bottom"></div>

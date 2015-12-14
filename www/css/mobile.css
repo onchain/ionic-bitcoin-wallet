@@ -151,10 +151,24 @@ _:-ms-fullscreen, :root .main {
   background: #2C3E50;
 }
 
+.second-bottom-bar {
+  z-index: 6;
+}
+
+.second-bottom-bar.animated.slideInRight,
+.second-bottom-bar.animated.slideInLeft {
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+}
+
+.menu-toggle {
+    padding-top: 1rem !important;
+}
+
 .amount {
   width: 100%;
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 2.5rem 1rem 1.5rem 1rem;
   margin-bottom: 11px;
   color: #fff;
   height: 175px;
@@ -184,18 +198,17 @@ _:-ms-fullscreen, :root .main {
 }
 
 .walletHome .avatar-wallet {
-  padding: 1.7rem 1rem;
+  padding: 0.5rem;
   width: 75px;
   height: 75px;
   position: absolute;
   top: -33px;
-  font-size: 35px;
+  font-size: 2.2rem;
   border: 3px solid #fff;
   background: #1ABC9C;
   margin: 0;
   color: #FFF;
   font-weight: 700;
-  line-height: 15px;
   text-align: center;
   border-radius: 5px;
 }
@@ -240,12 +253,6 @@ ul.copayer-list img {
   color: #A5B2BF;
 }
 
-.addresses .list-addr contact {
-  margin-left: 0;
-  font-size: 14px;
-}
-
-
 a.missing-copayers {
   bottom: -34px;
   text-align: center;
@@ -276,6 +283,14 @@ a.missing-copayers {
   background: #2C3E50;
 }
 
+.sidebar .icon {
+  width:  39px;
+  text-align: center;
+  margin-right: 15px;
+  float: left;
+  display: block;
+}
+
 .sidebar li {
   overflow: hidden;
   border-bottom: 1px solid #384B5F;
@@ -288,16 +303,15 @@ a.missing-copayers {
 .sidebar .avatar-wallet, .payment-uri .avatar-wallet, .modal-content .avatar-wallet {
   background-color: #2C3E50;
   color: #fff;
-  font-size: 20px;
+  font-size: 1.4rem;
   font-weight: 700;
   margin-right: 15px;
-  padding: 0.33rem 0.65rem;
-  line-height: 24px;
   text-align: center;
   float: left;
   width: 35px;
   height: 35px;
   border-radius: 3px;
+  padding: 2px;
 }
 
 .sidebar header {
@@ -326,7 +340,21 @@ a.missing-copayers {
   border-bottom: transparent;
   color: #A5B2BF;
   padding: 1rem 0.7rem;
-  line-height: 155%;
+}
+
+.modal-content ul li a.removeAddressbook {
+  background-color: white;
+  color: red;
+  margin-right: -10px;
+  float: right;
+}
+
+.modal-content ul li a.selectAddressbook {
+  float: left;
+  font-size: 18px;
+  padding: 13px 14px;
+  color: red;
+  margin-right: 10px;
 }
 
 .sidebar ul.off-canvas-list li a i {
@@ -551,6 +579,11 @@ to prevent collapsing during animation*/
 
 /*** modals ***/
 
+.hideModal {
+  visibility: none !important;
+  display: none !important;
+}
+
 .reveal-modal-bg {
   display: none !important;
 }
@@ -573,6 +606,7 @@ to prevent collapsing during animation*/
 body.modal-open {
   position: fixed;
   overflow: hidden;
+  z-index: 1;
 }
 
 .reveal-modal {
@@ -741,33 +775,36 @@ textarea:focus
   width: 100%;
   border-bottom: 1px solid #DEDFE1;
   margin-bottom: 25px;
-  padding: 0 0 .5rem 1rem;
   overflow: hidden;
 }
 
 .create-tab .tab-container {
   float: left;
+  text-align: center;
 }
 
 
 .create-tab a {
   font-size: .7rem;
-  padding: 0 0 .6rem;
+  padding: 0 .2rem .6rem .2rem;
   color: #929396;
   text-transform: uppercase;
   font-weight: 500;
+  display: block;
 }
 
-.create-tab a:hover,
-.create-tab a:focus {
-  border-bottom: 3px solid #929396;
+.tab-container:hover a {
+  color: #7A8C9E;
 }
 
-.create-tab a.selected,
-.create-tab a:active {
-  font-weight: 600;
+.tab-container.selected,
+.tab-container:active {
+  border-bottom: 3px solid #4B6178;
+}
+
+.tab-container.selected a {
   color: #2C3E50;
-  border-bottom: 3px solid #2C3E50;
+  font-weight: 600;
 }
 
 /* removes 300ms in IE */

@@ -9,8 +9,14 @@ angular.element(document).ready(function() {
 
   var handleBitcoinURI = function(url) {
     if (!url) return;
+    if (url.indexOf('glidera') != -1) {
+      url = '#/uri-glidera' + url.replace('bitcoin://glidera', '');
+    }
+    else {
+      url = '#/uri-payment/' + url;
+    }
     setTimeout(function() {
-      window.location = '#/uri-payment/' + url;
+      window.location = url;
     }, 1000);
   };
 
@@ -22,13 +28,20 @@ angular.element(document).ready(function() {
 
       document.addEventListener('pause', function() {
         if (!window.ignoreMobilePause) {
-          window.location = '#/';
+          setTimeout(function() {
+            window.location = '#/cordova/pause/';
+          }, 100);
         }
+        setTimeout(function() {
+          window.ignoreMobilePause = false;
+        }, 100);
       }, false);
 
       document.addEventListener('resume', function() {
         if (!window.ignoreMobilePause) {
-          window.location = '#/cordova/resume';
+          setTimeout(function() {
+            window.location = '#/cordova/resume/';
+          }, 100);
         }
         setTimeout(function() {
           window.ignoreMobilePause = false;
@@ -38,18 +51,18 @@ angular.element(document).ready(function() {
       // Back button event
       document.addEventListener('backbutton', function() {
         var loc = window.location;
-        if (loc.toString().match(/index\.html#\/$/)) {
-          navigator.app.exitApp();
-        } else {
-          window.location = '#/cordova/walletHome';
+        var isHome = loc.toString().match(/index\.html#\/$/) ? 'true' : '';
+        if (!window.ignoreMobilePause) {
+          window.location = '#/cordova/backbutton/'+isHome;
         }
+        setTimeout(function() {
+          window.ignoreMobilePause = false;
+        }, 100);
       }, false);
 
       document.addEventListener('menubutton', function() {
         window.location = '#/preferences';
       }, false);
-
-
 
       setTimeout(function() {
         navigator.splashscreen.hide();
@@ -59,10 +72,14 @@ angular.element(document).ready(function() {
       window.plugins.webintent.onNewIntent(handleBitcoinURI);
       window.handleOpenURL = handleBitcoinURI;
 
+      window.plugins.touchid.isAvailable(
+        function(msg) { window.touchidAvailable = true; }, // success handler: TouchID available
+        function(msg) { window.touchidAvailable = false; } // error handler: no TouchID available
+      );
+
       startAngular();
     }, false);
   } else {
-
     try {
       window.handleOpenURL = handleBitcoinURI;
       window.plugins.webintent.getUri(handleBitcoinURI);

@@ -48,19 +48,22 @@ angular.module('copayApp.services')
 
     service.buildGetTransactionOptions = function() {
       var reqParams = _getExtraParams(_address.split("|"));
+      var callbackURL = service.getParsed().post_back;
       return {
+        transformResponse: undefined,
         params: reqParams,
         method: 'GET',
-        url: service.getParsed().post_back
+        url: callbackURL
       };
     };
 
     service.postSignedRequest = function(txHex) {
       var reqParams = _getExtraParams(_address.split("|"));
       reqParams['tx'] = txHex;
+      var callbackURL = service.getParsed().post_back;
       return $http({
         method: 'POST',
-        url: service.getParsed().post_back,
+        url: callbackURL,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         transformRequest: function(obj) {
             var str = [];
@@ -68,6 +71,7 @@ angular.module('copayApp.services')
               str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
             return str.join("&");
         },
+        transformResponse: undefined,
         data: reqParams
       });
     };
@@ -91,15 +95,15 @@ angular.module('copayApp.services')
         }
         var pk = _getHDWalletDeterministicKey(service.crc16(_parsed.service));
         var pkWIF = pk.privateKey.toWIF();
-        var keyPair = Bitcoin.ECKey.fromWIF(pkWIF);
+        var keyPair = Bitcoin.ECPair.fromWIF(pkWIF);
         txb.sign(0, keyPair);
         return txb.build().toHex();
      };
 
     var _getHDWalletDeterministicKey = function(idx) {
       var fc = profileService.focusedClient;
-      var utils = bwcService.getUtils();
-      var HDPrivateKey = utils.Bitcore.HDPrivateKey;
+      var Bitcore = bwcService.getBitcore();
+      var HDPrivateKey = Bitcore.HDPrivateKey;
       var retrieved = new HDPrivateKey(fc.credentials.xPrivKey);
       var derivedByArgument = retrieved.derive(idx);
       return derivedByArgument;
@@ -133,6 +137,7 @@ angular.module('copayApp.services')
                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
               return str.join("&");
           },
+          transformResponse: undefined,
           data: reqObj
       };
 

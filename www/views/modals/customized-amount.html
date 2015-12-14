@@ -17,6 +17,13 @@
   <ul class="no-bullet size-14 m0">
     <li class="line-b p10 oh text-center">
       <qrcode size="220" data="bitcoin:{{addr + '?amount=' + customizedAmountBtc}}"></qrcode>
+      <div class="m10t text-center" ng-show="isCordova">
+        <span class="button outline dark-gray tiny round"
+          ng-click="shareAddress('bitcoin:' + addr + '?amount=' + customizedAmountBtc)">
+          <i class="fi-share"></i>
+          <span translate>Share address</span>
+        </span>
+      </div>
     </li>
   </ul>
   <h4 class="title m0" translate>Details</h4>
@@ -53,7 +60,7 @@
             <span translate>Amount</span>
           </label>
           <div class="input">
-            <input type="number" id="amount" name="amount" ng-attr-placeholder="{{'Amount'|translate}}"
+            <input type="number" id="amount" name="amount" ng-attr-placeholder="{{'Amount'|translate}}" 
             ng-model="_customAmount" valid-amount required autocomplete="off">
             <input type="number" id="alternative"  name="alternative"  ng-model="_customAlternative" style="display:none">
             <a class="postfix" ng-click="toggleAlternative()">{{unitName}}</a>
@@ -63,8 +70,8 @@
           <label for="alternative"><span translate>Amount in</span> {{ alternativeName }}
           </label>
           <div class="input">
-            <input type="number" id="alternative" name="alternative" ng-attr-placeholder="{{'Amount'|translate}}"
-            ng-model="_customAlternative" requiredautocomplete="off" required>
+            <input type="number" id="alternative" name="alternative" ng-attr-placeholder="{{'Amount'|translate}}" 
+            ng-model="_customAlternative" required autocomplete="off" required>
             <input type="number" id="amount" name="amount" ng-model="_customAmount" style="display:none">
             <a class="postfix" ng-click="toggleAlternative()"> {{ alternativeIsoCode }}</a>
           </div>

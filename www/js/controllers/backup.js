@@ -1,60 +1,87 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('backupController',
-  function($rootScope, $scope, $timeout, backupService, profileService, isMobile, isCordova, notification, go, gettext) {
-    this.isSafari = isMobile.Safari();
-    this.isCordova = isCordova;
-    this.error = null;
-    this.success = null;
+angular.module('copayApp.controllers').controller('wordsController',
+  function($rootScope, $scope, $timeout, profileService, go, gettext, confirmDialog, notification, bwsError, $log) {
 
+    var msg = gettext('Are you sure you want to delete the backup words?');
+    var successMsg = gettext('Backup words deleted');
+    var self = this;
+    self.show = false;
     var fc = profileService.focusedClient;
-    this.isEncrypted = fc.isPrivKeyEncrypted();
 
-    this.downloadWalletBackup = function() {
-      backupService.walletDownload(this.password, function() {
-        $rootScope.$emit('Local/BackupDone');
-        notification.success(gettext('Backup created'), gettext('Encrypted backup file saved'));
-        go.walletHome();
+    if (fc.isPrivKeyEncrypted()) self.credentialsEncrypted = true;
+    else {
+      setWords(fc.getMnemonic());
+    }
+    if (fc.credentials && !fc.credentials.mnemonicEncrypted && !fc.credentials.mnemonic) {
+      self.deleted = true;
+    }
+
+    self.toggle = function() {
+      self.error = "";
+      if (!self.credentialsEncrypted) {
+        if (!self.show)
+          $rootScope.$emit('Local/BackupDone');
+        self.show = !self.show;
+      }
+
+      if (self.credentialsEncrypted)
+        self.passwordRequest();
+
+      $timeout(function() {
+        $scope.$apply();
+      }, 1);
+    };
+
+    self.delete = function() {
+      confirmDialog.show(msg, function(ok) {
+        if (ok) {
+          fc.clearMnemonic();
+          profileService.updateCredentialsFC(function() {
+            self.deleted = true;
+            notification.success(successMsg);
+            go.walletHome();
+          });
+        }
       });
     };
 
-    this.getBackup = function() {
-      return backupService.walletExport(this.password);
-    };
+    $scope.$on('$destroy', function() {
+      profileService.lockFC();
+    });
 
-    this.viewWalletBackup = function() {
-      var self = this;
-      $timeout(function() {
-        self.backupWalletPlainText = self.getBackup();
-        $rootScope.$emit('Local/BackupDone');
-      }, 100);
-    };
-
-    this.copyWalletBackup = function() {
-      var ew = this.getBackup();
-      window.cordova.plugins.clipboard.copy(ew);
-      window.plugins.toast.showShortCenter('Copied to clipboard');
-      $rootScope.$emit('Local/BackupDone');
-    };
-
-    this.sendWalletBackup = function() {
-      var fc = profileService.focusedClient;
-      if (isMobile.Android() || isMobile.Windows()) {
-        window.ignoreMobilePause = true;
+    function setWords(words) {
+      if (words) {
+        self.mnemonicWords = words.split(/[\u3000\s]+/);
+        self.mnemonicHasPassphrase = fc.mnemonicHasPassphrase();
+        self.useIdeograms = words.indexOf("\u3000") >= 0;
       }
-      window.plugins.toast.showShortCenter('Preparing backup...');
-      var name = (fc.credentials.walletName || fc.credentials.walletId);
-      if (fc.alias) {
-        name = fc.alias + ' [' + name + ']';
-      }
-      var ew = this.getBackup();
-      var properties = {
-        subject: 'Copay Wallet Backup: ' + name,
-        body: 'Here is the encrypted backup of the wallet ' + name + ': \n\n' + ew + '\n\n To import this backup, copy all text between {...}, including the symbols {}',
-        isHtml: false
-      };
-      $rootScope.$emit('Local/BackupDone');
-      window.plugin.email.open(properties);
     };
 
+    self.passwordRequest = function() {
+      try {
+        setWords(fc.getMnemonic());
+      } catch (e) {
+        if (e.message && e.message.match(/encrypted/) && fc.isPrivKeyEncrypted()) {
+          self.credentialsEncrypted = true;
+
+          $timeout(function() {
+            $scope.$apply();
+          }, 1);
+
+          profileService.unlockFC(function(err) {
+            if (err) {
+              self.error = bwsError.msg(err, gettext('Could not decrypt'));
+              $log.warn('Error decrypting credentials:', self.error); //TODO
+              return;
+            }
+            if (!self.show && self.credentialsEncrypted)
+              self.show = !self.show;
+            self.credentialsEncrypted = false;
+            setWords(fc.getMnemonic());
+            $rootScope.$emit('Local/BackupDone');
+          });
+        }
+      }
+    }
   });

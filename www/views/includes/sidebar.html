@@ -1,6 +1,7 @@
 <nav class="sidebar left-off-canvas-menu" ng-controller="sidebarController as sidebar">
   <header>
-    <img src="img/logo-negative.svg" alt="Copay" width="80">
+    <logo ng-if="!sidebar.isWindowsPhoneApp" negative="true" width="80"></logo>
+    <img ng-if="sidebar.isWindowsPhoneApp" src="img/logo-negative.png" alt="Copay" width="80">
     <div ng-include="'views/includes/version.html'"></div>
   </header>
   <ul class="off-canvas-list">
@@ -12,17 +13,27 @@
       <div class="avatar-wallet"
         ng-style="{'background-color':item.color}">{{(item.name || item.id) | limitTo: 1}}</div>
       <div class="name-wallet" ng-class="{'m8t':item.n == 1}">{{item.name || item.id}}</div>
-      <div class="size-12" ng-show="item.n > 1">{{item.m}} <span translate>of</span> {{item.n}}</div>
+      <div class="size-12" ng-show="item.n > 1" translate>{{item.m}}-of-{{item.n}}</div>
     </a>
     </li>
     <li>
       <a ng-click="$root.go('add')" class="oh">
         <i class="icon-arrow-right3 size-18 right m10t"></i>
-        <i class="fi-plus size-24 db left m20r m5t"></i>
+        <i class="fi-plus size-24 icon"></i>
         <div class="tu text-bold">
           <span class="size-12" translate>Add wallet</span>
         </div>
         <div translate>Create, join or import</div>
+      </a>
+    </li>
+    <li ng-show="index.glideraEnabled">
+      <a ng-click="$root.go('glidera')" class="oh">
+        <i class="icon-arrow-right3 size-18 right m10t"></i>
+        <i class="icon-bank size-24 icon"></i>
+        <div class="tu text-bold">
+          <span class="size-12">Buy &amp; Sell Bitcoin</span>
+        </div>
+        <div>Glidera</div>
       </a>
     </li>
   </ul>
