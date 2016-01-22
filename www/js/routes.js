@@ -284,6 +284,17 @@ angular
           },
         }
       })
+      .state('bitIDNotice', {
+        url: '/bitid/notice',
+        templateUrl: 'views/bitid-notice.html',
+        walletShouldBeComplete: true,
+        needProfile: true,
+        views: {
+          'main': {
+            templateUrl: 'views/bitid-notice.html',
+          },
+        }
+      })
       .state('preferencesColor', {
         url: '/preferencesColor',
         templateUrl: 'views/preferencesColor.html',

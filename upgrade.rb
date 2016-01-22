@@ -57,3 +57,8 @@ puts '<script src="lib/trezor-connect/login.js"></script>'
 # Open directives/qrScanner.js replace isCordova with isDevice
 # Replace cloudSky.zBar.scan({}, onSuccess, onError); with the cordova one.
 # remove anything checking windows mobile
+
+# Update the disableScannerListener and add the addressParser, bitIDService, onChainService
+# to walletHome.js
+
+# Add BITID function to go.js service

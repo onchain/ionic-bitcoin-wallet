@@ -1,6 +1,11 @@
 'use strict';
 
-angular.module('copayApp.controllers').controller('walletHomeController', function($scope, $rootScope, $timeout, $filter, $modal, $log, notification, txStatus, isCordova, isMobile, profileService, lodash, configService, rateService, storageService, bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, addressService, ledger, bwsError, confirmDialog, txFormatService, animationService, addressbookService, go, feeService) {
+angular.module('copayApp.controllers').controller('walletHomeController', 
+  function($scope, $rootScope, $timeout, $filter, $modal, $log, notification, 
+  txStatus, isCordova, isMobile, profileService, lodash, configService, rateService, 
+  storageService, bitcore, isChromeApp, gettext, gettextCatalog, nodeWebkit, 
+  addressService, ledger, bwsError, confirmDialog, txFormatService, animationService, addressbookService, 
+  addressParser, bitIDService, onChainService, go, feeService) {
 
   var self = this;
   window.ignoreMobilePause = false;
@@ -29,15 +34,69 @@ angular.module('copayApp.controllers').controller('walletHomeController', functi
   this.lockedCurrentFeePerKb = null;
 
   var disableScannerListener = $rootScope.$on('dataScanned', function(event, data) {
-    self.setForm(data);
-    $rootScope.$emit('Local/SetTab', 'send');
-
-    var form = $scope.sendForm;
-    if (form.address.$invalid && !self.blockUx) {
-      self.resetForm();
-      self.error = gettext('Could not recognize a valid Bitcoin QR Code');
+    if (addressParser.isBitID(data) === true) {
+      self.setOngoingProcess('Preparing BitID Authentication');
+      bitIDService.setAddress(data);
+      go.bitID().then(function() {
+        self.setOngoingProcess();
+      });
+    } else if(addressParser.isOnChain(data) === true) {
+      onChainService.setAddress(data);
+      if(onChainService.getParsed().cmd == 'mpk') {
+        var serviceUrl = onChainService.getParsed().service;
+        self.confirmDialog('Share your Master Public Key with '+serviceUrl+'?', function(confirmed){
+          if(confirmed) {
+            self.setOngoingProcess('Sharing Master Public Key with '+serviceUrl);
+            var req = onChainService.processMPK();
+            req.then(function(data, status, headers, config) {
+              alert('Master Public Key shared');
+              self.setOngoingProcess();
+            }, function(data, status, headers, config) {
+              alert('Error sharing Master Public Key');
+              self.setOngoingProcess();
+            });
+          }
+      });
+      } else if(onChainService.getParsed().cmd == 'sign') {
+        _signTransaction();
+      }
+    } else {
+      go.send();
+      self.setForm(data);
+      $rootScope.$emit('Local/SetTab', 'send');
     }
   });
+
+  var _signTransaction = function() {
+    var serviceUrl = onChainService.getParsed().service;
+    self.confirmDialog('Sign the transaction with '+serviceUrl+'?', function(confirmed){
+      if(confirmed) {
+        self.setOngoingProcess('Signing transaction with '+serviceUrl);
+        var txReq = onChainService.getTransaction();
+        txReq.then(function(data, status, headers, config) {
+          self.setOngoingProcess('Sending singature');
+          try {
+            var txHex = onChainService.signTransaction(data.data);
+            var postReq = onChainService.postSignedRequest(txHex);
+            postReq.then(function(pData, pStatus, pHeaders, pConfig) {
+              alert('Transaction signed');
+              self.setOngoingProcess();
+            }, function(pData, pStatus, pHeaders, pConfig) {
+              var message = pData.message || '';
+              alert('Error posting signed transaction. '+message);
+              self.setOngoingProcess();
+            });
+          } catch (err) {
+            alert(err);
+            self.setOngoingProcess();
+          }
+        }, function(data, status, headers, config) {
+          alert('Error getting transaction');
+          self.setOngoingProcess();
+        });
+      }
+    });
+  };
 
   var disablePaymentUriListener = $rootScope.$on('paymentUri', function(event, uri) {
     $rootScope.$emit('Local/SetTab', 'send');
