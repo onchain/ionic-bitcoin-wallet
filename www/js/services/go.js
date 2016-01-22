@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('copayApp.services').factory('go', function($window, $rootScope, $location, $state, profileService, nodeWebkit) {
+angular.module('copayApp.services').factory('go', function($window, $rootScope, $location, $state, $timeout, profileService, nodeWebkit) {
   var root = {};
 
   var hideSidebars = function() {
@@ -32,8 +32,7 @@ angular.module('copayApp.services').factory('go', function($window, $rootScope, 
   root.openExternalLink = function(url, target) {
     if (nodeWebkit.isDefined()) {
       nodeWebkit.openExternalLink(url);
-    }
-    else {
+    } else {
       target = target || '_blank';
       var ref = window.open(url, target, 'location=no');
     }
@@ -53,7 +52,7 @@ angular.module('copayApp.services').factory('go', function($window, $rootScope, 
     toggleSidebar(invert);
   };
 
-  root.walletHome = function() {
+  root.walletHome = function(delayed) {
     var fc = profileService.focusedClient;
     if (fc && !fc.isComplete()) {
       root.path('copayers');
@@ -64,9 +63,6 @@ angular.module('copayApp.services').factory('go', function($window, $rootScope, 
     }
   };
 
-  root.bitID = function() {
-    return $state.go('bitIDNotice');
-  }
 
   root.send = function() {
     root.path('walletHome', function() {
@@ -82,13 +78,17 @@ angular.module('copayApp.services').factory('go', function($window, $rootScope, 
     $state.go('preferences');
   };
 
+  root.preferencesGlobal = function() {
+    $state.go('preferencesGlobal');
+  };
+
   root.reload = function() {
     $state.reload();
   };
 
 
   // Global go. This should be in a better place TODO
-  // We dont do a 'go' directive, to use the benefits of ng-touch with ng-click
+  // We don't do a 'go' directive, to use the benefits of ng-touch with ng-click
   $rootScope.go = function(path) {
     root.path(path);
   };

@@ -2,7 +2,7 @@
  * angular-mm-foundation
  * http://pineconellc.github.io/angular-foundation/
 
- * Version: 0.6.0 - 2015-04-13
+ * Version: 0.7.0 - 2015-09-25
  * License: MIT
  * (c) Pinecone, LLC
  */
@@ -149,7 +149,7 @@ angular.module('mm.foundation.accordion', [])
 angular.module("mm.foundation.alert", [])
 
 .controller('AlertController', ['$scope', '$attrs', function ($scope, $attrs) {
-  $scope.closeable = 'close' in $attrs;
+  $scope.closeable = 'close' in $attrs && typeof $attrs.close !== "undefined";
 }])
 
 .directive('alert', function () {
@@ -416,20 +416,17 @@ angular.module('mm.foundation.dropdownToggle', [ 'mm.foundation.position', 'mm.f
       closeMenu   = angular.noop;
   return {
     restrict: 'CA',
-    scope: {
-      dropdownToggle: '@'
-    },
     controller: 'DropdownToggleController',
     link: function(scope, element, attrs, controller) {
-      var parent = element.parent();
-      var dropdown = angular.element($document[0].querySelector(scope.dropdownToggle));
+      var parent = element.parent(),
+          dropdown = angular.element($document[0].querySelector(attrs.dropdownToggle));
 
       var parentHasDropdown = function() {
         return parent.hasClass('has-dropdown');
       };
 
       var onClick = function (event) {
-        dropdown = angular.element($document[0].querySelector(scope.dropdownToggle));
+        dropdown = angular.element($document[0].querySelector(attrs.dropdownToggle));
         var elementWasOpen = (element === openElement);
 
         event.preventDefault();
@@ -2203,6 +2200,8 @@ angular.module('mm.foundation.tabs', [])
   var ctrl = this,
       tabs = ctrl.tabs = $scope.tabs = [];
 
+  if (angular.isUndefined($scope.openOnLoad)) { $scope.openOnLoad = true; }
+
   ctrl.select = function(tab) {
     angular.forEach(tabs, function(tab) {
       tab.active = false;
@@ -2212,7 +2211,7 @@ angular.module('mm.foundation.tabs', [])
 
   ctrl.addTab = function addTab(tab) {
     tabs.push(tab);
-    if (tabs.length === 1 || tab.active) {
+    if ($scope.openOnLoad && (tabs.length === 1 || tab.active)) {
       ctrl.select(tab);
     }
   };
@@ -2264,7 +2263,9 @@ angular.module('mm.foundation.tabs', [])
     restrict: 'EA',
     transclude: true,
     replace: true,
-    scope: {},
+    scope: {
+      openOnLoad: '=?'
+    },
     controller: 'TabsetController',
     templateUrl: 'template/tabs/tabset.html',
     link: function(scope, element, attrs) {
@@ -3161,10 +3162,10 @@ angular.module('mm.foundation.typeahead', ['mm.foundation.position', 'mm.foundat
             } else {
               resetMatches();
             }
-            isLoadingSetter(originalScope, false);
           }
         }, function(){
           resetMatches();
+        }).finally(function() {
           isLoadingSetter(originalScope, false);
         });
       };

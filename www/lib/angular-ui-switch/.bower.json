@@ -37,6 +37,6 @@
     "commit": "52c93cf42f5c2dcc8a869caa8d4331181a1ab766"
   },
   "_source": "git://github.com/xpepermint/angular-ui-switch.git",
-  "_target": "~0.1.0",
+  "_target": "0.1.1",
   "_originalSource": "angular-ui-switch"
 }

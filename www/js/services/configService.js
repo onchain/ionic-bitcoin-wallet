@@ -41,6 +41,21 @@ angular.module('copayApp.services').factory('configService', function(storageSer
     rates: {
       url: 'https://insight.bitpay.com:443/api/rates',
     },
+
+    pushNotifications: {
+      enabled: true,
+      config: {
+        android: {
+          senderID: '1036948132229',
+        },
+        ios: {
+          alert: 'true',
+          badge: 'true',
+          sound: 'true',
+        },
+        windows: {},
+      }
+    },
   };
 
   var configCache = null;
@@ -70,7 +85,7 @@ angular.module('copayApp.services').factory('configService', function(storageSer
           configCache.wallet.settings.unitCode = defaultConfig.wallet.settings.unitCode;
         }
         if (!configCache.glidera) {
-          configCache.glidera = defaultConfig.glidera; 
+          configCache.glidera = defaultConfig.glidera;
         }
 
       } else {
@@ -87,7 +102,7 @@ angular.module('copayApp.services').factory('configService', function(storageSer
   };
 
   root.set = function(newOpts, cb) {
-    var config = defaultConfig;
+    var config = lodash.clone(defaultConfig);
     storageService.getConfig(function(err, oldOpts) {
       if (lodash.isString(oldOpts)) {
         oldOpts = JSON.parse(oldOpts);

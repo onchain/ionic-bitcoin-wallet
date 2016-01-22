@@ -1,7 +1,7 @@
 {
   "name": "angular-qrcode",
-  "version": "5.1.0",
-  "main": "qrcode.js",
+  "version": "6.0.3",
+  "main": "angular-qrcode.js",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -9,6 +9,6 @@
   ],
   "dependencies": {
     "angular": ">=1.0.6",
-    "qrcode-generator": "git://github.com/monospaced/bower-qrcode-generator.git#0.0.1"
+    "qrcode-generator": "git://github.com/monospaced/bower-qrcode-generator.git#0.0.2"
   }
 }

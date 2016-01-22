@@ -3,9 +3,9 @@
         "name": "Pinecone, LLC"
     },
     "name": "angular-foundation",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "main": ["./mm-foundation-tpls.js"],
     "dependencies": {
-        "angular": ">=1"
+        "angular": ">=1.3.0"
     }
 }

@@ -4,7 +4,7 @@ angular.module('copayApp.services')
 
     var root = {};
 
-    // File storage is not supported for writting according to 
+    // File storage is not supported for writing according to 
     // https://github.com/apache/cordova-plugin-file/#supported-platforms
     var shouldUseFileStorage = isCordova && !isMobile.Windows();
     $log.debug('Using file storage:', shouldUseFileStorage);
@@ -65,7 +65,7 @@ angular.module('copayApp.services')
           return storage.set('profile', text, function(err) {
             return cb(err, text);
           });
-        } catch(e) {
+        } catch (e) {
           $log.warn('Decrypt error: ', e);
           return cb('Could not decrypt storage: device ID mismatch');
         };
@@ -120,7 +120,6 @@ angular.module('copayApp.services')
 
     root.getProfile = function(cb) {
       storage.get('profile', function(err, str) {
-
         if (err || !str)
           return cb(err);
 
@@ -199,10 +198,7 @@ angular.module('copayApp.services')
       storage.remove('config', cb);
     };
 
-    root.setCopayDisclaimerFlag = function(cb) {
-      storage.set('agreeDisclaimer', true, cb);
-    };
-
+    //for compatibility
     root.getCopayDisclaimerFlag = function(cb) {
       storage.get('agreeDisclaimer', cb);
     };
@@ -234,6 +230,14 @@ angular.module('copayApp.services')
     root.getAddressbook = function(network, cb) {
       storage.get('addressbook-' + network, cb);
     };
+
+    root.setDeviceToken = function(token, cb) {
+      storage.set('token', token, cb);
+    }
+
+    root.getDeviceToken = function(cb) {
+      storage.get('token', cb);
+    }
 
     root.removeAddressbook = function(network, cb) {
       storage.remove('addressbook-' + network, cb);

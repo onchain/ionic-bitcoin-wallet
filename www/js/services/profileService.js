@@ -81,7 +81,7 @@ angular.module('copayApp.services')
           client.credentials.walletId, client.credentials.walletName);
 
         if (root.focusedClient.credentials.walletId == client.credentials.walletId) {
-          $rootScope.$emit(n.type);
+          $rootScope.$emit(n.type, n);
         } else {
           $rootScope.$apply();
         }
@@ -127,38 +127,38 @@ angular.module('copayApp.services')
           if (err) return cb(err);
           root._setFocus(focusedWalletId, function() {
             $rootScope.$emit('Local/ProfileBound');
-            return cb();
+            root.isDisclaimerAccepted(function(val) {
+              if (!val) {
+                return cb(new Error('NONAGREEDDISCLAIMER: Non agreed disclaimer'));
+              } else {
+                return cb();
+              }
+            });
           });
         });
       });
+
     };
 
     root.loadAndBindProfile = function(cb) {
-      storageService.getCopayDisclaimerFlag(function(err, val) {
-        if (!val) {
-          return cb(new Error('NONAGREEDDISCLAIMER: Non agreed disclaimer'));
+      storageService.getProfile(function(err, profile) {
+        if (err) {
+          $rootScope.$emit('Local/DeviceError', err);
+          return cb(err);
+        }
+        if (!profile) {
+          // Migration??
+          storageService.tryToMigrate(function(err, migratedProfile) {
+            if (err) return cb(err);
+            if (!migratedProfile)
+              return cb(new Error('NOPROFILE: No profile'));
+
+            profile = migratedProfile;
+            return root.bindProfile(profile, cb);
+          })
         } else {
-          storageService.getProfile(function(err, profile) {
-            if (err) {
-              $rootScope.$emit('Local/DeviceError', err);
-              return cb(err);
-            }
-            if (!profile) {
-              // Migration?? 
-              storageService.tryToMigrate(function(err, migratedProfile) {
-                if (err) return cb(err);
-                if (!migratedProfile)
-                  return cb(new Error('NOPROFILE: No profile'));
-
-                profile = migratedProfile;
-                return root.bindProfile(profile, cb);
-              })
-            } else {
-              $log.debug('Profile read');
-              return root.bindProfile(profile, cb);
-            }
-
-          });
+          $log.debug('Profile read');
+          return root.bindProfile(profile, cb);
         }
       });
     };
@@ -304,34 +304,38 @@ angular.module('copayApp.services')
     root.deleteWalletFC = function(opts, cb) {
       var fc = root.focusedClient;
       var walletId = fc.credentials.walletId;
-      $log.debug('Deleting Wallet:', fc.credentials.walletName);
 
-      fc.removeAllListeners();
-      root.profile.credentials = lodash.reject(root.profile.credentials, {
-        walletId: walletId
-      });
+      $rootScope.$emit('Local/UnsubscribeNotifications', walletId, function() {
 
-      delete root.walletClients[walletId];
-      root.focusedClient = null;
+        $log.debug('Deleting Wallet:', fc.credentials.walletName);
 
-      storageService.clearLastAddress(walletId, function(err) {
-        if (err) $log.warn(err);
-      });
+        fc.removeAllListeners();
+        root.profile.credentials = lodash.reject(root.profile.credentials, {
+          walletId: walletId
+        });
 
-      storageService.removeTxHistory(walletId, function(err) {
-        if (err) $log.warn(err);
-      });
+        delete root.walletClients[walletId];
+        root.focusedClient = null;
 
-      storageService.clearBackupFlag(walletId, function(err) {
-        if (err) $log.warn(err);
-      });
+        storageService.clearLastAddress(walletId, function(err) {
+          if (err) $log.warn(err);
+        });
 
-      $timeout(function() {
-        root.setWalletClients();
-        root.setAndStoreFocus(null, function() {
-          storageService.storeProfile(root.profile, function(err) {
-            if (err) return cb(err);
-            return cb();
+        storageService.removeTxHistory(walletId, function(err) {
+          if (err) $log.warn(err);
+        });
+
+        storageService.clearBackupFlag(walletId, function(err) {
+          if (err) $log.warn(err);
+        });
+
+        $timeout(function() {
+          root.setWalletClients();
+          root.setAndStoreFocus(null, function() {
+            storageService.storeProfile(root.profile, function(err) {
+              if (err) return cb(err);
+              return cb();
+            });
           });
         });
       });
@@ -367,6 +371,7 @@ angular.module('copayApp.services')
         return cb(gettext('Wallet already in Copay' + ": ") + w.walletName);
       }
 
+      var config = configService.getSync();
       var defaults = configService.getDefaults();
       var bwsFor = {};
       bwsFor[walletId] = opts.bwsurl || defaults.bws.url;
@@ -379,9 +384,28 @@ angular.module('copayApp.services')
         root.profile.credentials.push(JSON.parse(walletClient.export()));
         root.setWalletClients();
 
-        root.setAndStoreFocus(walletId, function() {
-          storageService.storeProfile(root.profile, function(err) {
-            return cb(err, walletId);
+
+        var handleImport = function(cb) {
+          var isImport = opts.mnemonic || opts.externalSource || opts.extendedPrivateKey;
+
+          if (!isImport)
+            return cb();
+
+          $rootScope.$emit('Local/BackupDone', walletId);
+
+          if (!walletClient.isComplete())
+            return cb();
+
+          storageService.setCleanAndScanAddresses(walletId, cb);
+        };
+
+        handleImport(function() {
+          root.setAndStoreFocus(walletId, function() {
+            storageService.storeProfile(root.profile, function(err) {
+              if (config.pushNotifications.enabled)
+                $rootScope.$emit('Local/SubscribeNotifications');
+              return cb(err, walletId);
+            });
           });
         });
       });
@@ -503,6 +527,37 @@ angular.module('copayApp.services')
       });
     };
 
+    root.setDisclaimerAccepted = function(cb) {
+      storageService.getProfile(function(err, profile) {
+        profile.disclaimerAccepted = true;
+        storageService.storeProfile(profile, function(err) {
+          return cb(err);
+        });
+      });
+    };
+
+    root.isDisclaimerAccepted = function(cb) {
+      storageService.getProfile(function(err, profile) {
+        if (profile && profile.disclaimerAccepted)
+          return cb(true);
+        else if (profile && !profile.disclaimerAccepted) {
+          storageService.getCopayDisclaimerFlag(function(err, val) {
+            if (val) {
+              profile.disclaimerAccepted = true;
+              storageService.storeProfile(profile, function(err) {
+                if (err) $log.error(err);
+                return cb(true);
+              });
+            } else {
+              return cb();
+            }
+          });
+        } else {
+          return cb();
+        }
+      });
+    };
+
     root.importLegacyWallet = function(username, password, blob, cb) {
       var walletClient = bwcService.getClient();
 
@@ -591,7 +646,7 @@ angular.module('copayApp.services')
           });
         }
         $timeout(function() {
-          if (fc.isPrivKeyEncrypted()) {
+          if (fc.hasPrivKeyEncrypted()) {
             $log.debug('Locking wallet automatically');
             root.lockFC();
           };
@@ -613,7 +668,8 @@ angular.module('copayApp.services')
           name: config.aliasFor[c.walletId] || c.walletName,
           id: c.walletId,
           network: c.network,
-          color: config.colorFor[c.walletId] || '#2C3E50'
+          color: config.colorFor[c.walletId] || '#4A90E2',
+          copayerId: c.copayerId
         };
       });
       ret = lodash.filter(ret, function(w) {
@@ -641,7 +697,7 @@ angular.module('copayApp.services')
 
     root._signWithTrezor = function(txp, cb) {
       var fc = root.focusedClient;
-      $log.info('Requesting Trezor  to sign the transaction');
+      $log.info('Requesting Trezor to sign the transaction');
 
       var xPubKeys = lodash.pluck(fc.credentials.publicKeyRing, 'xPubKey');
       trezor.signTx(xPubKeys, txp, fc.credentials.account, function(err, result) {

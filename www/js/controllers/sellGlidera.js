@@ -14,6 +14,8 @@ angular.module('copayApp.controllers').controller('sellGlideraController',
     this.currentFeeLevel = config.wallet.settings.feeLevel || 'normal';
     var fc;
 
+    window.ignoreMobilePause = true;
+
     var otherWallets = function(testnet) {
       var network = testnet ? 'testnet' : 'livenet';
       return lodash.filter(profileService.getWallets(network), function(w) {
@@ -48,6 +50,7 @@ angular.module('copayApp.controllers').controller('sellGlideraController',
       var ModalInstanceCtrl = function($scope, $modalInstance) {
         $scope.type = 'SELL';
         $scope.wallets = wallets;
+        $scope.noColor = true;
         $scope.cancel = function() {
           $modalInstance.dismiss('cancel');
         };

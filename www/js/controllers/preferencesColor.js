@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('preferencesColorController',
-  function($scope, configService, profileService, go) {
+  function($scope, $timeout, $log, configService, profileService, go) {
     var config = configService.getSync();
     this.colorOpts = [
       '#DD4B39',
       '#F38F12',
       '#FAA77F',
-      '#FADA58',
+      '#D0B136',
       '#9EDD72',
       '#77DADA',
       '#4A90E2',
@@ -33,12 +33,12 @@ angular.module('copayApp.controllers').controller('preferencesColorController',
       opts.colorFor[walletId] = color;
 
       configService.set(opts, function(err) {
-        if (err) {
-          $scope.$emit('Local/DeviceError', err);
-          return;
-        }
-        self.color = color;
+        if (err) $log.warn(err);
+        go.preferences();
         $scope.$emit('Local/ColorUpdated');
+        $timeout(function() {
+          $scope.$apply();
+        }, 100);
       });
 
     };

@@ -1,168 +1,160 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="format-detection" content="telephone=no">
-    <title>Copay - Multisignature Wallet</title>
-    <link href="css/icons.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet">
-    <link href="css/mobile.css" rel="stylesheet">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="stylesheet" type="text/css" href="css/foundation.css">
+  <link rel="stylesheet" type="text/css" href="icons/foundation-icons.css">
+  <link rel="stylesheet" type="text/css" href="css/copay.css">
+  <title>Copay - Multisignature Wallet</title>
+  <link rel="shortcut icon" href="img/favicon.ico">
+</head>
+<body ng-cloak="" class="ng-cloak">
 
-    <!-- Bower installed CSS -->
-    <link href="lib/foundation/css/foundation.css" rel="stylesheet">
-    <link href="lib/foundation-icon-fonts/foundation-icons.css" rel="stylesheet">
-    <link href="lib/animate.css/animate.css" rel="stylesheet">
-    <link href="lib/angular-ui-switch/angular-ui-switch.css" rel="stylesheet">
+  <div class="page" ng-controller="indexController as index" ng-swipe-disable-mouse="" ng-swipe-left="index.closeMenu()" ng-swipe-right="index.openMenu()">
 
-    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="css/ionic.app.css" rel="stylesheet">
-    -->
+    <div class="off-canvas-wrap" id="off-canvas-wrap">
+      <div class="inner-wrap">
+        <div ng-include="&apos;views/includes/sidebar.html&apos;" ng-if="index.hasProfile"></div>
 
-    <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
-
-    <!-- Bower installed libraries -->
-    <script src="lib/fastclick/lib/fastclick.js"></script>
-    <script src="lib/qrcode-generator/js/qrcode.js"></script>
-    <script src="lib/qrcode-decoder-js/lib/qrcode-decoder.js"></script>
-    <script src="lib/moment/min/moment-with-locales.js"></script>
-    <script src="lib/angular-foundation/mm-foundation-tpls.js"></script>
-    <script src="lib/angular-moment/angular-moment.js"></script>
-    <script src="lib/ng-lodash/build/ng-lodash.js"></script>
-    <script src="lib/angular-qrcode/qrcode.js"></script>
-    <script src="lib/angular-gettext/dist/angular-gettext.js"></script>
-    <script src="lib/angular-bitcore-wallet-client/angular-bitcore-wallet-client.js"></script>
-    <script src="lib/angular-ui-switch/angular-ui-switch.js"></script>
-    <script src="lib/trezor-connect/login.js"></script>
-    <script src="lib/bitcoinjs.min.js"></script>
-
-    <!-- cordova script (this will be a 404 during development) -->
-    <script src="cordova.js"></script>
-
-    <!-- your app's js -->
-    <script src="js/app.js"></script>
-    <script src="js/init.js"></script>
-    <script src="js/version.js"></script>
-    <script src="js/trezor-url.js"></script>
-    <script src="js/translations.js"></script>
-    <script src="js/services/storageService.js"></script>
-    <script src="js/services/rateService.js"></script>
-    <script src="js/services/notificationsService.js"></script>
-    <script src="js/services/localStorage.js"></script>
-    <script src="js/services/configService.js"></script>
-    <script src="js/services/applicationService.js"></script>
-    <script src="js/services/go.js"></script>
-    <script src="js/services/historicLog.js"></script>
-    <script src="js/services/txStatus.js"></script>
-    <script src="js/services/profileService.js"></script>
-    <script src="js/services/isChromeApp.js"></script>
-    <script src="js/services/uriHandler.js"></script>
-    <script src="js/services/sjcl.js"></script>
-    <script src="js/services/backupService.js"></script>
-    <script src="js/services/nodeWebkit.js"></script>
-    <script src="js/services/isMobile.js"></script>
-    <script src="js/services/isCordova.js"></script>
-    <script src="js/services/isDevice.js"></script>
-    <script src="js/services/swipe.js"></script>
-    <script src="js/services/notifications.js"></script>
-    <script src="js/services/legacyImportService.js"></script>
-    <script src="js/services/logHeader.js"></script>
-    <script src="js/services/balanceService.js"></script>
-    <script src="js/services/pluginManager.js"></script>
-    <script src="js/services/addressService.js"></script>
-    <script src="js/services/fileStorage.js"></script>
-    <script src="js/services/txFormatService.js"></script>
-    <script src="js/services/trezor.js"></script>
-    <script src="js/services/ledger.js"></script>
-    <script src="js/services/isDevel.js"></script>
-    <script src="js/services/hwWallet.js"></script>
-    <script src="js/services/glideraService.js"></script>
-    <script src="js/services/feeService.js"></script>
-    <script src="js/services/derivationPathHelper.js"></script>
-    <script src="js/services/confirmDialog.js"></script>
-    <script src="js/services/bwsError.js"></script>
-    <script src="js/services/animationService.js"></script>
-    <script src="js/services/addressbookService.js"></script>
-    <script src="js/services/addonManager.js"></script>
-    <script src="js/services/uxLanguage.js"></script>
-    <script src="js/services/bitcore.js"></script>
-    <script src="js/services/addressParser.js"></script>
-    <script src="js/services/bitIDService.js"></script>
-    <script src="js/services/onChainService.js"></script>
-    <script src="js/directives/ngSwipe.js"></script>
-    <script src="js/directives/qrScanner.js"></script>
-    <script src="js/directives/directives.js"></script>
-    <script src="js/models/profile.js"></script>
-    <script src="js/filters/filters.js"></script>
-    <script src="js/routes.js"></script>
-    <script src="js/controllers/preferencesAltCurrency.js"></script>
-    <script src="js/controllers/create.js"></script>
-    <script src="js/controllers/join.js"></script>
-    <script src="js/controllers/preferences.js"></script>
-    <script src="js/controllers/preferencesUnit.js"></script>
-    <script src="js/controllers/preferencesBwsUrl.js"></script>
-    <script src="js/controllers/preferencesLogs.js"></script>
-    <script src="js/controllers/preferencesAdvanced.js"></script>
-    <script src="js/controllers/version.js"></script>
-    <script src="js/controllers/import.js"></script>
-    <script src="js/controllers/preferencesLanguage.js"></script>
-    <script src="js/controllers/preferencesFee.js"></script>
-    <script src="js/controllers/preferencesEmail.js"></script>
-    <script src="js/controllers/backup.js"></script>
-    <script src="js/controllers/sidebar.js"></script>
-    <script src="js/controllers/preferencesDelete.js"></script>
-    <script src="js/controllers/walletHome.js"></script>
-    <script src="js/controllers/preferencesAbout.js"></script>
-    <script src="js/controllers/preferencesColor.js"></script>
-    <script src="js/controllers/paymentUri.js"></script>
-    <script src="js/controllers/topbar.js"></script>
-    <script src="js/controllers/importLegacy.js"></script>
-    <script src="js/controllers/index.js"></script>
-    <script src="js/controllers/devLogin.js"></script>
-    <script src="js/controllers/password.js"></script>
-    <script src="js/controllers/preferencesAlias.js"></script>
-    <script src="js/controllers/copayers.js"></script>
-    <script src="js/controllers/sidebar.js"></script>
-    <script src="js/controllers/buyGlidera.js"></script>
-    <script src="js/controllers/disclaimer.js"></script>
-    <script src="js/controllers/export.js"></script>
-    <script src="js/controllers/glidera.js"></script>
-    <script src="js/controllers/glideraUri.js"></script>
-    <script src="js/controllers/paperWallet.js"></script>
-    <script src="js/controllers/preferencesGlidera.js"></script>
-    <script src="js/controllers/preferencesInformation.js"></script>
-    <script src="js/controllers/sellGlidera.js"></script>
-    <script src="js/controllers/splash.js"></script>
-    <script src="js/controllers/bitIDNotice.js"></script>
-
-    <link rel="shortcut icon" href="img/favicon.ico">
-  </head>
-  <body ng-cloak="" class="ng-cloak">
-
-    <div class="page" ng-controller="indexController as index" ng-swipe-disable-mouse="" ng-swipe-left="index.closeMenu()" ng-swipe-right="index.openMenu()">
-
-      <div class="off-canvas-wrap" id="off-canvas-wrap">
-        <div class="inner-wrap">
-          <div ng-include="&apos;views/includes/sidebar.html&apos;" ng-if="index.hasProfile"></div>
-
-          <div notifications="right top"></div>
-          <div ng-include="&apos;views/includes/password.html&apos;" ng-if="index.askPassword"></div>
-          <div ng-include="&apos;views/includes/alert.html&apos;" ng-if="index.showAlert"></div>
-          <div id="sectionContainer">
-            <div id="mainSection">
-              <section ui-view="main" ng-class="{
-                  &apos;main&apos;: index.hasProfile
-                }"></section>
-            </div>
+        <div notifications="right top"></div> 
+        <div ng-include="&apos;views/includes/password.html&apos;" ng-if="index.askPassword"></div>
+        <div ng-include="&apos;views/includes/alert.html&apos;" ng-if="index.showAlert"></div>
+        <div id="sectionContainer">
+          <div id="mainSection">
+            <section ui-view="main" ng-class="{
+                &apos;main&apos;: index.hasProfile
+              }"></section>
           </div>
-          <a class="close-menu" ng-click="index.closeMenu()"></a>
-
         </div>
+        <a class="close-menu" ng-click="index.closeMenu()"></a>
+
       </div>
     </div>
+  </div>
+  
+<script src="lib/ionic/js/ionic.bundle.js"></script>
+  
+          
+<script src="lib/fastclick/lib/fastclick.js"></script>
+<script src="lib/qrcode-generator/js/qrcode.js"></script>
+<script src="lib/qrcode-decoder-js/lib/qrcode-decoder.js"></script>
+<script src="lib/moment/min/moment-with-locales.js"></script>
+<script src="lib/angular-foundation/mm-foundation-tpls.js"></script>
+<script src="lib/angular-moment/angular-moment.js"></script>
+<script src="lib/ng-lodash/build/ng-lodash.js"></script>
+<script src="lib/angular-qrcode/angular-qrcode.js"></script>
+<script src="lib/angular-gettext/dist/angular-gettext.js"></script>
+<script src="lib/angular-touch/angular-touch.js"></script>
+<script src="lib/angular-ui-switch/angular-ui-switch.js"></script>
+<script src="lib/angular-bitcore-wallet-client/angular-bitcore-wallet-client.js"></script>
+<script src="lib/bitcoinjs.min.js"></script>
 
-  </body>
+  <!-- DO NOT DELETE THIS COMMET  -->
+  <!-- PLACEHOLDER: CORDOVA SRIPT -->
+  
+  <script src="js/app.js"></script>
+<script src="js/routes.js"></script>
+<script src="js/directives/directives.js"></script>
+<script src="js/directives/qrScanner.js"></script>
+<script src="js/directives/ngSwipe.js"></script>
+<script src="js/filters/filters.js"></script>
+<script src="js/models/profile.js"></script>
+<script src="js/services/profileService.js"></script>
+<script src="js/services/hwWallet.js"></script>
+<script src="js/services/ledger.js"></script>
+<script src="js/services/storageService.js"></script>
+<script src="js/services/sjcl.js"></script>
+<script src="js/services/legacyImportService.js"></script>
+<script src="js/services/balanceService.js"></script>
+<script src="js/services/bwsError.js"></script>
+<script src="js/services/addressParser.js"></script>
+<script src="js/services/txStatus.js"></script>
+<script src="js/services/logHeader.js"></script>
+<script src="js/services/bitIDService.js"></script>
+<script src="js/services/confirmDialog.js"></script>
+<script src="js/services/go.js"></script>
+<script src="js/services/uriHandler.js"></script>
+<script src="js/services/onChainService.js"></script>
+<script src="js/services/isCordova.js"></script>
+<script src="js/services/notificationsService.js"></script>
+<script src="js/services/animationService.js"></script>
+<script src="js/services/derivationPathHelper.js"></script>
+<script src="js/services/uxLanguage.js"></script>
+<script src="js/services/backupService.js"></script>
+<script src="js/services/pushNotificationsService.js"></script>
+<script src="js/services/addressService.js"></script>
+<script src="js/services/isChromeApp.js"></script>
+<script src="js/services/addressbookService.js"></script>
+<script src="js/services/feeService.js"></script>
+<script src="js/services/addonManager.js"></script>
+<script src="js/services/bitcore.js"></script>
+<script src="js/services/isDevice.js"></script>
+<script src="js/services/txFormatService.js"></script>
+<script src="js/services/fileStorage.js"></script>
+<script src="js/services/isMobile.js"></script>
+<script src="js/services/swipe.js"></script>
+<script src="js/services/notifications.js"></script>
+<script src="js/services/configService.js"></script>
+<script src="js/services/historicLog.js"></script>
+<script src="js/services/localStorage.js"></script>
+<script src="js/services/pluginManager.js"></script>
+<script src="js/services/trezor.js"></script>
+<script src="js/services/applicationService.js"></script>
+<script src="js/services/nodeWebkit.js"></script>
+<script src="js/services/isDevel.js"></script>
+<script src="js/services/glideraService.js"></script>
+<script src="js/services/rateService.js"></script>
+<script src="js/controllers/termOfUse.js"></script>
+<script src="js/controllers/splash.js"></script>
+<script src="js/controllers/preferencesEmail.js"></script>
+<script src="js/controllers/copayers.js"></script>
+<script src="js/controllers/preferencesDelete.js"></script>
+<script src="js/controllers/glideraUri.js"></script>
+<script src="js/controllers/sellGlidera.js"></script>
+<script src="js/controllers/paymentUri.js"></script>
+<script src="js/controllers/preferencesGlidera.js"></script>
+<script src="js/controllers/buyGlidera.js"></script>
+<script src="js/controllers/preferencesUnit.js"></script>
+<script src="js/controllers/password.js"></script>
+<script src="js/controllers/devLogin.js"></script>
+<script src="js/controllers/preferencesInformation.js"></script>
+<script src="js/controllers/version.js"></script>
+<script src="js/controllers/preferencesGlobal.js"></script>
+<script src="js/controllers/glidera.js"></script>
+<script src="js/controllers/preferencesAlias.js"></script>
+<script src="js/controllers/walletHome.js"></script>
+<script src="js/controllers/importLegacy.js"></script>
+<script src="js/controllers/preferences.js"></script>
+<script src="js/controllers/preferencesColor.js"></script>
+<script src="js/controllers/create.js"></script>
+<script src="js/controllers/sidebar.js"></script>
+<script src="js/controllers/preferencesAbout.js"></script>
+<script src="js/controllers/topbar.js"></script>
+<script src="js/controllers/preferencesBwsUrl.js"></script>
+<script src="js/controllers/bitIDNotice.js"></script>
+<script src="js/controllers/preferencesAdvanced.js"></script>
+<script src="js/controllers/backup.js"></script>
+<script src="js/controllers/preferencesHistory.js"></script>
+<script src="js/controllers/disclaimer.js"></script>
+<script src="js/controllers/join.js"></script>
+<script src="js/controllers/preferencesAltCurrency.js"></script>
+<script src="js/controllers/preferencesLanguage.js"></script>
+<script src="js/controllers/index.js"></script>
+<script src="js/controllers/import.js"></script>
+<script src="js/controllers/paperWallet.js"></script>
+<script src="js/controllers/preferencesFee.js"></script>
+<script src="js/controllers/preferencesLogs.js"></script>
+<script src="js/controllers/export.js"></script>
+<script src="js/controllers/preferencesDeleteWords.js"></script>
+<script src="js/translations.js"></script>
+<script src="js/version.js"></script>
+<script src="js/init.js"></script>
+<script src="js/trezor-url.js"></script>
+<script src="lib/trezor-connect/login.js"></script>
+
+</body>
 </html>

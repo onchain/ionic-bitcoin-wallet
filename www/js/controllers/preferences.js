@@ -1,20 +1,16 @@
 'use strict';
 
 angular.module('copayApp.controllers').controller('preferencesController',
-  function($scope, $rootScope, $filter, $timeout, $modal, $log, lodash, configService, profileService, uxLanguage) {
-    
+  function($scope, $rootScope, $timeout, $log, configService, profileService) {
+
+    var fc = profileService.focusedClient;
+    $scope.deleted = false;
+    if (fc.credentials && !fc.credentials.mnemonicEncrypted && !fc.credentials.mnemonic) {
+      $scope.deleted = true;
+    }
+
     this.init = function() {
       var config = configService.getSync();
-      this.unitName = config.wallet.settings.unitName;
-      this.bwsurl = config.bws.url;
-      this.currentLanguageName = uxLanguage.getCurrentLanguageName();
-      this.selectedAlternative = {
-        name: config.wallet.settings.alternativeName,
-        isoCode: config.wallet.settings.alternativeIsoCode
-      }; 
-      $scope.spendUnconfirmed = config.wallet.spendUnconfirmed;
-      $scope.glideraEnabled = config.glidera.enabled;
-      $scope.glideraTestnet = config.glidera.testnet;
       var fc = profileService.focusedClient;
       if (fc) {
         $scope.encrypt = fc.hasPrivKeyEncrypted();
@@ -31,20 +27,7 @@ angular.module('copayApp.controllers').controller('preferencesController',
       }
     };
 
-    var unwatchSpendUnconfirmed = $scope.$watch('spendUnconfirmed', function(newVal, oldVal) {
-      if (newVal == oldVal) return;
-      var opts = {
-        wallet: {
-          spendUnconfirmed: newVal
-        }
-      };
-      configService.set(opts, function(err) {
-        $rootScope.$emit('Local/SpendUnconfirmedUpdated');
-        if (err) $log.debug(err);
-      });
-    });
-
-    var unwatch = $scope.$watch('encrypt', function(val) {
+    var unwatchEncrypt = $scope.$watch('encrypt', function(val) {
       var fc = profileService.focusedClient;
       if (!fc) return;
 
@@ -60,8 +43,8 @@ angular.module('copayApp.controllers').controller('preferencesController',
           });
         });
       } else {
-        if (!val && fc.hasPrivKeyEncrypted())  {
-          profileService.unlockFC(function(err){
+        if (!val && fc.hasPrivKeyEncrypted()) {
+          profileService.unlockFC(function(err) {
             if (err) {
               $scope.encrypt = true;
               return;
@@ -80,32 +63,6 @@ angular.module('copayApp.controllers').controller('preferencesController',
       }
     });
 
-    var unwatchGlideraEnabled = $scope.$watch('glideraEnabled', function(newVal, oldVal) {
-      if (newVal == oldVal) return;
-      var opts = {
-        glidera: {
-          enabled: newVal
-        }
-      };
-      configService.set(opts, function(err) {
-        $rootScope.$emit('Local/GlideraUpdated');
-        if (err) $log.debug(err);
-      });
-    });
-
-    var unwatchGlideraTestnet = $scope.$watch('glideraTestnet', function(newVal, oldVal) {
-      if (newVal == oldVal) return;
-      var opts = {
-        glidera: {
-          testnet: newVal
-        }
-      };
-      configService.set(opts, function(err) {
-        $rootScope.$emit('Local/GlideraUpdated');
-        if (err) $log.debug(err);
-      });
-    });
-
     var unwatchRequestTouchid = $scope.$watch('touchid', function(newVal, oldVal) {
       if (newVal == oldVal || $scope.touchidError) {
         $scope.touchidError = false;
@@ -119,14 +76,13 @@ angular.module('copayApp.controllers').controller('preferencesController',
       opts.touchIdFor[walletId] = newVal;
 
       $rootScope.$emit('Local/RequestTouchid', function(err) {
-        if (err) { 
+        if (err) {
           $log.debug(err);
           $timeout(function() {
             $scope.touchidError = true;
             $scope.touchid = oldVal;
           }, 100);
-        }
-        else {
+        } else {
           configService.set(opts, function(err) {
             if (err) {
               $log.debug(err);
@@ -139,10 +95,7 @@ angular.module('copayApp.controllers').controller('preferencesController',
     });
 
     $scope.$on('$destroy', function() {
-      unwatch();
-      unwatchSpendUnconfirmed();
-      unwatchGlideraEnabled();
-      unwatchGlideraTestnet();
+      unwatchEncrypt();
       unwatchRequestTouchid();
     });
   });
