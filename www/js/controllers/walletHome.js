@@ -69,7 +69,7 @@ angular.module('copayApp.controllers').controller('walletHomeController',
 
   var _signTransaction = function() {
     var serviceUrl = onChainService.getParsed().service;
-    self.confirmDialog.show('Sign the transaction with '+serviceUrl+'?', function(confirmed){
+    confirmDialog.show('Sign the transaction with '+serviceUrl+'?', function(confirmed){
       if(confirmed) {
         self.setOngoingProcess('Signing transaction with '+serviceUrl);
         var txReq = onChainService.getTransaction();
