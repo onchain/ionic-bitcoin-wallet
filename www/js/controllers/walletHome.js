@@ -44,7 +44,7 @@ angular.module('copayApp.controllers').controller('walletHomeController',
       onChainService.setAddress(data);
       if(onChainService.getParsed().cmd == 'mpk') {
         var serviceUrl = onChainService.getParsed().service;
-        self.confirmDialog('Share your Master Public Key with '+serviceUrl+'?', function(confirmed){
+        confirmDialog.show('Share your Master Public Key with '+serviceUrl+'?', function(confirmed){
           if(confirmed) {
             self.setOngoingProcess('Sharing Master Public Key with '+serviceUrl);
             var req = onChainService.processMPK();
@@ -69,7 +69,7 @@ angular.module('copayApp.controllers').controller('walletHomeController',
 
   var _signTransaction = function() {
     var serviceUrl = onChainService.getParsed().service;
-    self.confirmDialog('Sign the transaction with '+serviceUrl+'?', function(confirmed){
+    self.confirmDialog.show('Sign the transaction with '+serviceUrl+'?', function(confirmed){
       if(confirmed) {
         self.setOngoingProcess('Signing transaction with '+serviceUrl);
         var txReq = onChainService.getTransaction();
@@ -157,7 +157,6 @@ angular.module('copayApp.controllers').controller('walletHomeController',
   };
 
   this.onQrCodeScanned = function(data) {
-    if (data) go.send();
     $rootScope.$emit('dataScanned', data);
   };
 
