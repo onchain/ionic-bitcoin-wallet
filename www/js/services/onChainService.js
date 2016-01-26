@@ -57,9 +57,10 @@ angular.module('copayApp.services')
       };
     };
 
-    service.postSignedRequest = function(txHex) {
+    service.postSignedRequest = function(signature) {
       var reqParams = _getExtraParams(_address.split("|"));
-      reqParams['tx'] = txHex;
+      reqParams['tx'] = signature[0];
+      reqParams['meta_data'] = signature[1];
       var callbackURL = service.getParsed().post_back;
       return $http({
         method: 'POST',
@@ -87,18 +88,53 @@ angular.module('copayApp.services')
     };
 
     service.signTransaction = function(transactionHex) {
-        var tx = Bitcoin.Transaction.fromHex(transactionHex);
-        var txb = Bitcoin.TransactionBuilder.fromTransaction(tx);
-        if(tx.outs.length == 0) {
-          alert('Error, invalid Transaction');
-          return;
-        }
-        var pk = _getHDWalletDeterministicKey(service.crc16(_parsed.service));
-        var pkWIF = pk.privateKey.toWIF();
-        var keyPair = Bitcoin.ECPair.fromWIF(pkWIF);
-        txb.sign(0, keyPair);
-        return txb.build().toHex();
-     };
+      
+      var txHex = transactionHex;
+      var sigList = null;
+      if(transactionHex.indexOf(':') != -1) {
+        txHex = transactionHex.substring(0, transactionHex.indexOf(':'));
+        sigList = transactionHex.substring(transactionHex.indexOf(':') + 1, transactionHex.length);
+      }
+      var tx = Bitcoin.Transaction.fromHex(txHex);
+      var txb = Bitcoin.TransactionBuilder.fromTransaction(tx);
+      if(tx.outs.length == 0) {
+        alert('Error, invalid Transaction');
+        return;
+      }
+      var pk = _getHDWalletDeterministicKey(service.crc16(_parsed.service));
+      var pkWIF = pk.privateKey.toWIF();
+      var keyPair = Bitcoin.ECPair.fromWIF(pkWIF);
+      //txb.sign(0, keyPair);
+      //var signedHex = txb.build().toHex();
+      var signedHex = txHex;
+      if(sigList != null) {
+        sigList = _signSignatureList(keyPair, sigList);
+      }
+      
+      return [signedHex, sigList];
+    };
+     
+    var _signSignatureList = function(key, sigList) {
+      
+      // Get a buffer
+      var Bitcore = bwcService.getBitcore();
+      
+      var sigs = JSON.parse(sigList);
+      
+      var pk = key.getPublicKeyBuffer().toString('hex');
+      
+      for(var x = 0; x < sigs.length; x++) {
+        
+          var public_key = Object.keys(sigs[x])[0];
+          if(public_key == pk) {
+            var hash_to_sign = sigs[x][public_key]['hash']
+            var signed_hash = key.sign_hex_hash(hash_to_sign).toDER().toString("hex");
+            sigs[x][public_key]['sig'] = signed_hash;
+          } 
+      }
+      
+      return JSON.stringify(sigs);
+    }; 
 
     var _getHDWalletDeterministicKey = function(idx) {
       var fc = profileService.focusedClient;
