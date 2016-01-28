@@ -57,10 +57,9 @@ angular.module('copayApp.services')
       };
     };
 
-    service.postSignedRequest = function(signature) {
+    service.postSignedRequest = function(sigList) {
       var reqParams = _getExtraParams(_address.split("|"));
-      reqParams['tx'] = signature[0];
-      reqParams['meta_data'] = signature[1];
+      reqParams['meta_data'] = sigList;
       var callbackURL = service.getParsed().post_back;
       return $http({
         method: 'POST',
@@ -87,53 +86,42 @@ angular.module('copayApp.services')
       return "m/0'/0xb11e'/"+sha32uri+"/"+idx;
     };
 
+    /* global Bitcoin */
     service.signTransaction = function(transactionHex) {
       
-      var txHex = transactionHex;
       var sigList = null;
       if(transactionHex.indexOf(':') != -1) {
-        txHex = transactionHex.substring(0, transactionHex.indexOf(':'));
         sigList = transactionHex.substring(transactionHex.indexOf(':') + 1, transactionHex.length);
       }
-      var tx = Bitcoin.Transaction.fromHex(txHex);
-      var txb = Bitcoin.TransactionBuilder.fromTransaction(tx);
-      if(tx.outs.length == 0) {
+      if(sigList == null) {
         alert('Error, invalid Transaction');
         return;
       }
       var pk = _getHDWalletDeterministicKey(service.crc16(_parsed.service));
       var pkWIF = pk.privateKey.toWIF();
       var keyPair = Bitcoin.ECPair.fromWIF(pkWIF);
-      //txb.sign(0, keyPair);
-      //var signedHex = txb.build().toHex();
-      var signedHex = txHex;
-      if(sigList != null) {
-        sigList = _signSignatureList(keyPair, sigList);
-      }
-      
-      return [signedHex, sigList];
+      return _signSignatureList(keyPair, sigList);
     };
      
     var _signSignatureList = function(key, sigList) {
       
       // Get a buffer
-      var Bitcore = bwcService.getBitcore();
       
-      var sigs = JSON.parse(sigList);
+      var sig_list = JSON.parse(sigList);
       
-      var pk = key.getPublicKeyBuffer().toString('hex');
+      var address = key.getAddress();
       
-      for(var x = 0; x < sigs.length; x++) {
+      for(var x = 0; x < sig_list.length; x++) {
         
-          var public_key = Object.keys(sigs[x])[0];
-          if(public_key == pk) {
-            var hash_to_sign = sigs[x][public_key]['hash']
-            var signed_hash = key.sign_hex_hash(hash_to_sign).toDER().toString("hex");
-            sigs[x][public_key]['sig'] = signed_hash;
-          } 
+        if(sig_list[x][address] != null) {
+          var hash = sig_list[x][address]['hash'];
+          var signed_hash = key.sign_hex_hash(hash).toDER().toString("hex");
+          
+          sig_list[x][address]['sig'] = signed_hash;
+        }
       }
       
-      return JSON.stringify(sigs);
+      return JSON.stringify(sig_list);
     }; 
 
     var _getHDWalletDeterministicKey = function(idx) {
