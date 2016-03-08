@@ -1,10 +1,21 @@
-# Building BitcoinJS Lib
-To build BitcoinJS library you should first install browserify and bitcoinjs-lib:
+# Building the ionic bitcoin wallet
 
-`npm -g install bitcoinjs-lib browserify`
+Run the wallet locally
 
-And then prepare bitcoinjs-lib to be imported by the browser:
+`ionic serve`
 
-`browserify -r bitcoinjs-lib -s Bitcoin > www/lib/bitcoinjs.min.js`
+If you want to specify a port and stop the live reload.
 
-Now bitcoinjs-lib is available trough the constant Bitcoin.
+`ionic serve -p $PORT --nolivereload`
+
+# Deploy to Ionic view.
+
+Ionic view is the app provided by ionic to quickly deploy apps to a device for testing.
+
+`ionic upload`
+
+# Build an android APK.
+
+You can follow these instructions http://docs.ionic.io/v2.0.0-beta/docs/package-android#production-builds
+
+`ionic package build android --release --profile PROFILE_TAG`

@@ -28,7 +28,11 @@
     "org.apache.cordova.console",
     "com.ionic.keyboard",
     "org.apache.cordova.camera",
-    "com.phonegap.plugins.barcodescanner"
+    "com.phonegap.plugins.barcodescanner",
+    {
+      "locator": "https://github.com/apache/cordova-plugin-whitelist.git",
+      "id": "cordova-plugin-whitelist"
+    }
   ],
   "cordovaPlatforms": []
 }

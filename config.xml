@@ -76,4 +76,5 @@
   </platform>
   <icon src="resources/android/icon/drawable-xhdpi-icon.png"/>
   <hook type="after_prepare" src="package-hooks/android_ignore_translation_errors.js"/>
+  <allow-navigation href="*" />
 </widget>
