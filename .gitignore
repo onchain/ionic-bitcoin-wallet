@@ -11,3 +11,6 @@ plugins
 *.log
 *.DS_Store
 resources
+
+#ionic config.json api keys
+io-ionic.json
